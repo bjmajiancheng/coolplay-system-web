@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <title>首页</title>
+    <!--开发-->
+    <!--<link rel="stylesheet" href="../easyui/themes/gray/easyui.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/superBlue.css" id="themeCss">
+    <script src="js/super.js" type="text/javascript" charset="utf-8"></script>-->
+    <!--测试dist-->
+    <!-- jQuery UI -->
+    <link href="cdn/vendors/jquery-ui/jquery-ui.min.css" rel="stylesheet" media="screen">
+    <link href="cdn/vendors/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="cdn/vendors/bootstrap-fileinput/bootstrap-fileinput.css" rel="stylesheet" media="screen">
+    <link href="cdn/vendors/jquery-file-upload/css/jquery.fileupload.css" rel="stylesheet" media="screen">
+    <link href="cdn/vendors/jquery-file-upload/css/jquery.fileupload-ui.css" rel="stylesheet" media="screen">
+    <link href="cdn/vendors/zTree/css/zTreeStyle/zTreeStyle.css" rel="stylesheet">
+    <link href="cdn/vendors/jquery-easyui-texteditor/texteditor.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="cdn/vendors/jquery-easyui-1.7.0/themes/gray/easyui.css">
+    <!--<link rel="stylesheet" href="cdn/vendors/easyui/themes/gray/easyui.css">-->
+    <link rel="stylesheet" href="cdn/super/css/font-awesome.min.css">
+    <link rel="stylesheet" href="cdn/super/superBlue.css" id="themeCss">
+    <link rel="stylesheet" href="css/common.css">
+
+
+</head>
+
+<body id="main" class="easyui-layout">
+<div data-options="region:'north',border:false" class="super-north">
+    <!--顶部-->
+    <div class="super-navigation">
+        <!--系统名称-->
+        <div class="super-navigation-title">企业运营后台</div>
+        <!--自定义导航-->
+        <div class="super-navigation-main">
+            <div class="super-setting-left">
+                <!--<ul>
+                    <li><i class="fa fa-commenting-o"></i>消息</li>
+                    <li><i class="fa fa-envelope-o"></i>邮件</li>
+                    <li><i class="fa fa-bell-o"></i>通知</li>
+                </ul>-->
+            </div>
+            <div class="super-setting-right">
+                <ul>
+                    <li>
+                        <div class="super-setting-icon">
+                            <i class="fa fa-gears"></i>
+                        </div>
+                        <div id="mm" class="easyui-menu">
+                            <div>个人中心</div>
+                            <div id="themeSetting">主题</div>
+                            <div class="menu-sep"></div>
+                            <div id="logout">退出</div>
+                        </div>
+                    </li>
+                    <li class="user">
+                        <span class="user-icon"><img src="cdn/img/favicon.png"/></span><span id="gUserName"></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div data-options="region:'west',title:'企业运营后台',border:false" class="super-west">
+    <!--左侧导航 style="display:none;"-->
+    <div class="easyui-accordion" data-options="border:false,fit:true,selected:true" id="vertical-menu" >
+
+    </div>
+</div>
+<div data-options="region:'center'" style="padding-top: 2px;">
+    <!--主要内容-->
+    <div id="tt" class="easyui-tabs" data-options="border:false,fit:true">
+        <div title="首页" data-options="iconCls:'fa fa-home'">
+            <div style="padding: 20px;">
+                欢迎回来！
+            </div>
+        </div>
+    </div>
+</div>
+<div data-options="region:'south'" class="super-south">
+    <!--页脚-->
+    <div class="super-footer-info">
+        <!--<span><i class="fa fa-info-circle"></i> 作者：tianyu</span>-->
+        <span><i class="fa fa-copyright"></i> CopyRight 2019 版权所有 <i class="fa fa-caret-right"></i></span>
+    </div>
+</div>
+
+<!--主题设置弹窗-->
+<div id="win">
+    <div class="themeItem">
+        <ul>
+            <li>
+                <div class="superGreen" style="background: #1abc9c;">green</div>
+            </li>
+            <li class="themeActive">
+                <div class="superBlue" style="background: #3498db;">blue</div>
+            </li>
+            <li>
+                <div class="superGray" style="background: #95a5a6;">gray</div>
+            </li>
+            <li>
+                <div class="superAmethyst" style="background: #9b59b6;">amethyst</div>
+            </li>
+            <li>
+                <div class="superBlack" style="background: #34495e;">black</div>
+            </li>
+            <li>
+                <div class="superYellow" style="background: #e67e22;">yellow</div>
+            </li>
+            <li>
+                <div class="superEmerald" style="background: #2ecc71;">emerald</div>
+            </li>
+            <li>
+                <div class="superRed" style="background: #e74c3c;">red</div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!--easyui-->
+<!--<script src="cdn/vendors/easyui/jquery.min.js" type="text/javascript" charset="utf-8"></script>-->
+<script src="cdn/vendors/jquery-easyui-1.7.0/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="cdn/vendors/jquery-ui/jquery-ui.min.js"></script>
+
+<script src="cdn/vendors/bootstrap/js/bootstrap.js"></script>
+<script src="cdn/vendors/bootbox.js"></script>
+<script src="cdn/vendors/jquery.tmpl.min.js"></script>
+<script src="cdn/vendors/ajaxfileupload.js"></script>
+<script src="cdn/vendors/jquery.cookie/jquery.cookie.js"></script>
+<script src="cdn/vendors/bootstrap-fileinput/bootstrap-fileinput.js"></script>
+<script src="cdn/vendors/jquery-file-upload/js/jquery.fileupload.js"></script>
+<script src="cdn/vendors/jquery-file-upload/js/jquery.fileupload-jquery-ui.js"></script>
+<script src="cdn/vendors/zTree/js/jquery.ztree.core-3.5.min.js"></script>
+<script src="cdn/vendors/zTree/js/jquery.ztree.excheck-3.5.min.js"></script>
+<script src="cdn/vendors/zTree/js/jquery.ztree.exedit-3.5.min.js"></script>
+
+<script src="js/app.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/common.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/nav.js" type="text/javascript" charset="utf-8"></script>
+
+<!--<script src="cdn/vendors/easyui/jquery.easyui.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="cdn/vendors/easyui/locale/easyui-lang-zh_CN.js" type="text/javascript" charset="utf-8"></script>-->
+
+<script src="cdn/vendors/jquery-easyui-1.7.0/jquery.easyui.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="cdn/vendors/jquery-easyui-1.7.0/locale/easyui-lang-zh_CN.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="cdn/vendors/jquery-easyui-texteditor/jquery.texteditor.js"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=I9koTHOWtxzVXA60W8SyGDkObzLlrYFM"></script>
+
+<script src="cdn/super/super.js"></script>
+<script src="cdn/super/superDemo.js" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript">
+    ;(function ($, window, document, undefined){
+        window.App.page = {};
+        window.App.page.urls = [
+            "dvd/system/function.html",
+            "dvd/system/role.html",
+            "dvd/system/user.html",
+            "dvd/system/dept.html",
+            "dvd/company/company.html",
+            "dvd/company/coolplayBase.html",
+            "dvd/company/companyCircle.html"
+        ];
+    })(jQuery, window, document);
+
+</script>
+</body>
+
+</html>

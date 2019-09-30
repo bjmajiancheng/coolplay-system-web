@@ -1,0 +1,45 @@
+.form-item {
+    margin-left: 15px;
+    margin-bottom: 15px;
+    float: left;
+}
+
+.form-item>label {
+    min-width: 107px;
+    display: inline-block;
+}
+
+.form-item input, select {
+    width: 170px;
+}
+
+.search-form-item {
+    margin-left: 15px;
+    margin-bottom: 15px;
+    float: left;
+}
+
+.search-form-item>label {
+    min-width: 72px;
+    display: inline-block;
+}
+
+.search-form-item input, select {
+    width: 170px;
+}
+
+.clear{
+    clear:both
+}
+
+.align_center {
+    text-align: center
+}
+
+.align_left {
+    text-align: center
+}
+
+.align_right {
+    text-align: center
+}

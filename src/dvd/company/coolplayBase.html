@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <title>基地列表</title>
+
+    <style type="text/css">
+        body, html {width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
+        #allmap{width:50%;height:300px;}
+        p{margin-left:5px; font-size:14px;}
+    </style>
+</head>
+
+<body>
+
+<div class="super-theme-example">
+    <div class="search-form-item col-md-4">
+        <label class="label-top">基地名称：</label>
+        <input name="baseName" class="easyui-validatebox easyui-textbox" prompt="请输入基地名称">
+    </div>
+
+    <div class="search-form-item col-md-4">
+        <label class="label-top">基地状态：</label>
+
+        <select class="easyui-combobox" data-options="editable:false,panelHeight:null" name="isClose">
+            <option value="" selected>全部</option>
+            <option value="0">正常</option>
+            <option value="1">关闭</option>
+        </select>
+    </div>
+
+    <div class="search-form-item col-md-3">
+        <a href="javascript:void(0)" onclick="refreshCoolplayBase()" class="easyui-linkbutton primary">查询</a>
+        <a href="javascript:void(0)" onclick="addCoolplayBase()" class="easyui-linkbutton primary">创建基地</a>
+    </div>
+</div>
+
+<div class="clear"></div>
+
+<div class="super-theme-example">
+    <div style="height: 340px;">
+        <table id="coolplayBaseTab"></table>
+    </div>
+
+    <div id="coolplayBaseWin" style="display: none;padding-top:30px;" title="创建基地">
+        <form id="coolplayBaseForm" method="post">
+            <div class="form-item col-md-12">
+                <label class="label-top">基地全称：</label>
+
+                <input class="easyui-validatebox easyui-textbox" prompt="请输入基地全称" name="baseFullName" data-options="required:true, missingMessage:'请输入基地全称'">
+            </div>
+
+            <div class="form-item col-md-12">
+                <label class="label-top">基地简称：</label>
+                <input class="easyui-validatebox easyui-textbox" prompt="请输入基地简称" name="baseName" data-options="required:true, missingMessage:'请输入基地简称'">
+            </div>
+
+            <div class="form-item col-md-12" style="height:300px;">
+                <label class="label-top">基地基本信息：</label>
+                <!--<input class="easyui-validatebox easyui-textbox" prompt="请输入基地基本信息" name="baseDesc" data-options="required:true, missingMessage:'请输入基地基本信息'">-->
+                <input type="hidden" name="baseDesc"/>
+                <div class="easyui-texteditor" id="baseDescEditorDiv" title="基地基本信息" style="width:90%;height:300px;padding:20px;left:126px;top:0px;">
+
+                </div>
+            </div>
+
+            <div class="form-item col-md-12">
+                <label class="label-top">联系人：</label>
+                <input class="easyui-validatebox easyui-textbox" prompt="请输入联系人" name="contactName" data-options="required:true, missingMessage:'请输入联系人'">
+            </div>
+
+            <div class="form-item col-md-12">
+                <label class="label-top">基地地址：</label>
+                <input class="easyui-validatebox easyui-textbox" prompt="请输入基地地址" name="contactAddress" data-options="required:true, missingMessage:'请输入基地地址'">
+            </div>
+
+            <div class="form-item col-md-12">
+                <label class="label-top">联系电话：</label>
+                <input class="easyui-validatebox easyui-textbox" prompt="请输入联系电话" name="contactPhone" data-options="required:true, missingMessage:'请输入联系电话'">
+            </div>
+
+            <div class="form-item col-md-12" style="height:300px;">
+                <label class="label-top" style="float:left;">地图标点：</label>
+                <!--<input class="easyui-validatebox easyui-textbox" prompt="请输入地图标点" name="">-->
+                <input type="hidden" name="posX" />
+                <input type="hidden" name="posY" />
+                <div id="basePosMap" style="width:500px;height:300px;float:left;"></div>
+            </div>
+
+            <div class="form-item col-md-12">
+                <label class="label-top">起飞场GPS：</label>
+                <input class="easyui-validatebox easyui-textbox" prompt="请输入起飞场GPS" name="departuresGps" data-options="required:true, missingMessage:'请输入起飞场GPS'">
+            </div>
+
+            <div class="form-item col-md-12">
+                <label class="label-top">起飞场海拔高度：</label>
+                <input class="easyui-validatebox easyui-textbox" prompt="请输入起飞场海拔高度" name="departuresHeight" data-options="required:true, missingMessage:'请输入起飞场海拔高度'">
+            </div>
+
+            <div class="form-item col-md-12">
+                <label class="label-top">降落场GPS：</label>
+                <input class="easyui-validatebox easyui-textbox" prompt="请输入降落场GPS" name="landGps" data-options="required:true, missingMessage:'请输入降落场GPS'">
+            </div>
+
+            <div class="form-item col-md-12">
+                <label class="label-top">降落场海拔高度：</label>
+                <input class="easyui-validatebox easyui-textbox" prompt="请输入降落场海拔高度" name="landHeight" data-options="required:true, missingMessage:'请输入降落场海拔高度'">
+            </div>
+
+            <div class="form-item col-md-12">
+                <label class="label-top" style="float:left;">可飞风向：</label>
+                <!--<input class="easyui-validatebox easyui-textbox" prompt="请输入可飞风向" name="flyDirection" data-options="required:true, missingMessage:'请输入可飞风向'">
+-->
+                <div style="margin-left:20px;float:left;">
+                    <input class="easyui-checkbox" name="flyDirection" value="东" label="东:" />
+                </div>
+                <div style="margin-left:20px;float:left;">
+                    <input class="easyui-checkbox" name="flyDirection" value="南" label="南:" />
+                </div>
+                <div style="margin-left:20px;float:left;">
+                    <input class="easyui-checkbox" name="flyDirection" value="西" label="西:" />
+                </div>
+                <div style="margin-left:20px;float:left;">
+                    <input class="easyui-checkbox" name="flyDirection" value="北" label="北:" />
+                </div>
+                <div style="margin-left:20px;float:left;">
+                    <input class="easyui-checkbox" name="flyDirection" value="东南" label="东南:" />
+                </div>
+                <div style="margin-left:20px;float:left;">
+                    <input class="easyui-checkbox" name="flyDirection" value="东北" label="东北:" />
+                </div>
+                <div style="margin-left:20px;float:left;">
+                    <input class="easyui-checkbox" name="flyDirection" value="西南" label="西南:" />
+                </div>
+                <div style="margin-left:20px;float:left;">
+                    <input class="easyui-checkbox" name="flyDirection" value="西北" label="西北:" />
+                </div>
+            </div>
+
+            <div class="form-item col-md-12">
+                <label class="label-top">监控视频url：</label>
+                <input class="easyui-validatebox easyui-textbox" prompt="请输入监控视频url" name="monitorVideoUrl" data-options="required:true, missingMessage:'请输入监控视频url'">
+            </div>
+
+            <div class="form-item col-md-12">
+                <label class="label-top">基地类型：</label>
+                <input class="easyui-validatebox easyui-textbox" prompt="请输入基地类型" name="baseType" data-options="required:true, missingMessage:'请输入基地类型'">
+            </div>
+
+            <div class="form-item col-md-12">
+                <label class="label-top">标签：</label>
+
+                <label class="label-top labelIdsDiv">
+
+                </label>
+            </div>
+
+            <div class="form-item col-md-12">
+                <label class="label-top">开放时间：</label>
+                <input class="easyui-validatebox easyui-textbox" prompt="请输入开放时间" name="openTime" data-options="required:true, missingMessage:'请输入开放时间'">
+            </div>
+
+            <div class="form-item col-md-12">
+                <label class="label-top">容纳人数：</label>
+                <input class="easyui-validatebox easyui-textbox" prompt="请输入容纳人数" name="capacityCnt" data-options="required:true, missingMessage:'请输入容纳人数'">
+            </div>
+
+            <div class="form-item col-md-12">
+                <label class="label-top">状态：</label>
+
+                <select class="easyui-combobox" data-options="editable:false,panelHeight:null" name="isClose">
+                    <option value="" selected>全部</option>
+                    <option value="0">正常</option>
+                    <option value="1">关闭</option>
+                </select>
+            </div>
+
+            <div class="form-item col-md-12">
+                <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="saveCoolplayBaseWin()">确认新增</a>
+                <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="closeCoolplayBaseWin()">取消</a>
+            </div>
+        </form>
+    </div>
+
+    <div id="coolplayBaseDetailWin" style="display: none;padding-top:30px;" title="基地详情">
+        <div class="form-item col-md-12">
+            <label class="label-top">基地全称：</label>
+
+            <label class="label-top baseFullNameLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top">基地简称：</label>
+
+            <label class="label-top baseNameLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top">基地基本信息：</label>
+
+            <label class="label-top baseDescLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top">联系人：</label>
+
+            <label class="label-top contactNameLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top">基地地址：</label>
+
+            <label class="label-top contactAddressLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top">联系电话：</label>
+
+            <label class="label-top contactPhoneLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12" style="height:300px;">
+            <label class="label-top" style="float:left;">地图标点：</label>
+
+            <!--<label class="label-top Label"></label>-->
+            <div id="basePosDetailMap" style="width:500px;height:300px;float:left;"></div>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top">起飞场GPS：</label>
+
+            <label class="label-top departuresGpsLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top">起飞场海拔高度：</label>
+
+            <label class="label-top departuresHeightLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top">降落场GPS：</label>
+
+            <label class="label-top landGpsLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top">降落场海拔高度：</label>
+
+            <label class="label-top landHeightLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top">可飞风向：</label>
+
+            <label class="label-top flyDirectionLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top">监控视频url：</label>
+
+            <label class="label-top monitorVideoUrlLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top">基地类型：</label>
+
+            <label class="label-top baseTypeLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top">标签：</label>
+
+            <label class="label-top labelIdsLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top">开放时间：</label>
+
+            <label class="label-top openTimeLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top">容纳人数：</label>
+
+            <label class="label-top capacityCntLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top">状态：</label>
+
+            <label class="label-top isCloseLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="closeCoolplayBaseDetailWin()">关闭</a>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    ;(function ($, window, document, undefined){
+
+        $('#coolplayBaseTab').datagrid({
+            url: App.href + '/api/company/coolplayBase/list',
+            fit: true,
+            pagination: true,
+            fitColumns: true,
+            method: 'GET',
+            pageSize: 10,
+            pageList: [10, 25, 50, 100, 200],
+            height: 340,
+            queryParams: {},
+            toolbar: [],
+            loadFilter: function(data) {
+                if (data.code === 401) {
+                    App.showMsg('token失效,请登录!');
+                    window.location.href = App.href + '/login.html';
+                    return {"total":0, "rows": "[]"};
+                } else {
+                    return data;
+                }
+            },
+            onBeforeLoad: function (param) {
+                var baseName = $("input[name=baseName]").val();
+                var isClose = $("input[name=isClose]").val();
+
+                param.baseName = baseName;
+                param.isClose = isClose;
+            },
+            columns: [
+                [{
+                    field: 'id',
+                    title: '编号',
+                    sortable: true,
+                    width: 50
+                }, {
+                    field: 'contactName',
+                    title: '联系人',
+                    width: 50
+                }, {
+                    field: 'baseName',
+                    title: '基地名称',
+                    width: 50
+                },  {
+                    field: 'contactAddress',
+                    title: '基地地址',
+                    width: 50
+                },  {
+                    field: 'contactPhone',
+                    title: '电话',
+                    width: 50
+                },  {
+                    field: 'capacityCnt',
+                    title: '容纳人数',
+                    width: 50
+                },  {
+                    field: 'ctime',
+                    title: '创建时间',
+                    width: 100
+                },  {
+                    field: 'companyUserName',
+                    title: '创建人',
+                    width: 50
+                },  {
+                    field: 'isClose',
+                    title: '状态',
+                    width: 50,
+                    formatter: function(value, row, index) {
+                        var isCloseStr = "开放";
+                        if(row.isClose == 1) {
+                            isCloseStr = "关闭";
+                        }
+
+                        return isCloseStr;
+                    }
+                },  {
+                    field: 'custom_col1',
+                    title: '操作',
+                    width: 50,
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var btns = new Array();
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showCoolplayBase('+ row.id +')">详情</a>&nbsp;');
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="delCoolplayBase('+ row.id +')">删除</a>&nbsp;');
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="closeCoolplayBase('+ row.id +')">关闭</a>');
+                        return btns.join('');
+                    }
+                }]
+            ]
+        });
+
+        $('#coolplayBaseForm').form({
+            url: App.href + '/api/company/coolplayBase/saveCoolplayBase',
+            method: 'POST',
+            onSubmit:function(){
+                return $(this).form('validate');
+            },
+            success:function(data){
+                var obj = JSON.parse(data);
+                if (obj.code == 200) {
+                    App.showMsg('保存成功');
+                    $('#coolplayBaseWin').window('close');
+                } else {
+                    App.showMsg(obj.message);
+                }
+                $('#coolplayBaseTab').datagrid('reload');
+            }
+        });
+
+        App.getRequestData('/api/company/label/options', {}, function(data) {
+            var html = [];
+            if(data.length > 0) {
+                for(var i=0; i<data.length; i++) {
+                    html.push('<label for="labelIds'+ i +'">' + data[i].text + '：</label>');
+                    html.push('<input type="checkbox" id="labelIds'+ i +'" name="labelIds" value="'+ data[i].value +'" style="width: 50px;">');
+                }
+            }
+            $(".labelIdsDiv").append(html.join(''));
+        });
+
+    })(jQuery, window, document);
+
+
+    function refreshCoolplayBase() {
+        $('#coolplayBaseTab').datagrid('reload');
+    }
+
+    /**
+     * 添加公司基地
+     *
+     */
+    function addCoolplayBase() {
+        $('#coolplayBaseWin').window({
+            width: "80%",
+            height: "80%",
+            modal:true
+        });
+
+        //百度地图功能 START---
+        window.basePosMap = new BMap.Map("basePosMap");
+
+        /*map.centerAndZoom(new BMap.Point(map.getCenter().lng, map.getCenter().lat), map.getZoom());*/
+
+        window.basePosMap.centerAndZoom(new BMap.Point(116.4035,39.915),8);
+        window.basePosMap.enableScrollWheelZoom(true);
+        //百度地图功能 END---
+
+        window.basePosMap.addEventListener("click",function(e){
+
+            //移除所有标注
+            var allOverlay = window.basePosMap.getOverlays();
+            for(var i = 0;i<allOverlay.length;i++) {
+                if(allOverlay[i].toString()=="[object Marker]"){
+                    window.basePosMap.removeOverlay(allOverlay[i]);
+                }
+            }
+
+            console.log(e.point);
+            var markPoint = e.point;
+            var point = new BMap.Point(markPoint.lng, markPoint.lat);
+            var marker = new BMap.Marker(point);
+            window.basePosMap.addOverlay(marker);
+        });
+    }
+
+    /**
+     * 公司基地详情
+     *
+     * @param id
+     */
+    function showCoolplayBase(id) {
+        $('#coolplayBaseDetailWin').window({
+            width: "80%",
+            height: "80%",
+            modal:true
+        });
+
+        App.getRequestData('/api/company/coolplayBase/getCoolplayBase', {id: id}, function(data) {
+            $(".baseFullNameLabel").text(data.baseFullName);
+            $(".baseNameLabel").text(data.baseName);
+            $(".baseDescLabel").html(data.baseDesc);
+            $(".contactNameLabel").text(data.contactName);
+            $(".contactAddressLabel").text(data.contactAddress);
+            $(".contactPhoneLabel").text(data.contactPhone);
+
+            //百度地图功能 START---
+            window.basePosDetailMap = new BMap.Map("basePosDetailMap");
+
+            if(data.posX > 0 && data.posY > 0) {
+                window.basePosDetailMap.centerAndZoom(new BMap.Point(data.posX, data.posY),8);
+
+                var point = new BMap.Point(data.posX, data.posY);
+                var marker = new BMap.Marker(point);
+                window.basePosDetailMap.addOverlay(marker);
+            } else {
+                window.basePosDetailMap.centerAndZoom(new BMap.Point(116.404, 39.915),8);
+            }
+            window.basePosDetailMap.enableScrollWheelZoom(true);
+
+            //百度地图功能 END---
+
+            $(".departuresGpsLabel").text(data.departuresGps);
+            $(".departuresHeightLabel").text(data.departuresHeight);
+            $(".landGpsLabel").text(data.landGps);
+            $(".landHeightLabel").text(data.landHeight);
+            $(".flyDirectionLabel").text(data.flyDirection);
+            $(".monitorVideoUrlLabel").text(data.monitorVideoUrl);
+            $(".baseTypeLabel").text(data.baseType);
+            $(".labelIdsLabel").text(data.labelName);
+            $(".openTimeLabel").text(data.openTime);
+            $(".capacityCntLabel").text(data.capacityCnt);
+            var isCloseStr = "正常";
+            if(data.isClose == 1) {
+                isCloseStr = "关闭";
+            }
+            $(".isCloseLabel").text(isCloseStr);
+        });
+    }
+
+    /**
+     * 删除公司基地
+     *
+     * @param id
+     */
+    function delCoolplayBase(id) {
+        App.getRequestData('/api/company/coolplayBase/delCoolplayBase', {id: id, isDel: 1}, function(data){
+            App.showMsg('删除公司基地成功!');
+            $('#coolplayBaseTab').datagrid('reload');
+        });
+    }
+
+    /**
+     * 关闭公司基地
+     *
+     * @param id
+     */
+    function closeCoolplayBase(id) {
+        App.getRequestData('/api/company/coolplayBase/closeCoolplayBase', {id: id, isClose: 1}, function(data){
+            App.showMsg('关闭公司基地成功!');
+            $('#coolplayBaseTab').datagrid('reload');
+        });
+    }
+
+    /**
+     * 保存基地信息
+     */
+    function saveCoolplayBaseWin() {
+        var baseDescVal = $("#baseDescEditorDiv").texteditor('getValue');
+
+        $("input[name=baseDesc]").val(baseDescVal);
+
+        var allOverlay = window.basePosMap.getOverlays();
+        for(var i = 0;i<allOverlay.length;i++) {
+            if(allOverlay[i].toString()=="[object Marker]"){
+                $("#coolplayBaseForm").find("input[name=posX]").val(allOverlay[i].point.lng);
+                $("#coolplayBaseForm").find("input[name=posY]").val(allOverlay[i].point.lat);
+            }
+        }
+
+        if($("#coolplayBaseForm").find("input[name=posX]").val() == '') {
+            App.showMsg('请输入基地地图位置!');
+            return false;
+        }
+
+        $("#coolplayBaseForm").submit();
+    }
+
+    /**
+     * 关闭新增基地窗口
+     */
+    function closeCoolplayBaseWin() {
+        $('#coolplayBaseWin').window('close');
+    }
+
+    /**
+     * 关闭基地详情窗口
+     */
+    function closeCoolplayBaseDetailWin() {
+        $("#coolplayBaseDetailWin").window('close');
+    }
+</script>
+</body>
+</html>

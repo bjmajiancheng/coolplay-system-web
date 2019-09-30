@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>关联企业审批</title>
+</head>
+<body>
+<div class="super-theme-example">
+    <div class="search-form-item col-md-4">
+        <label class="label-top">圈子名称：</label>
+        <input name="circleName" class="easyui-validatebox easyui-textbox" prompt="请输入圈子名称">
+    </div>
+
+    <div class="search-form-item col-md-4">
+        <label class="label-top">审核状态：</label>
+        <select class="easyui-combobox" data-options="editable:false,panelHeight:null" name="reviewStatus">
+            <option value="" selected>全部</option>
+            <option value="0">未审核</option>
+            <option value="1">已审核</option>
+        </select>
+    </div>
+
+    <div class="search-form-item col-md-6">
+        <label class="label-top">申请时间：</label>
+        <input type="text" class="easyui-datebox" name="applicationStartTime"/> ~ <input type="text" class="easyui-datebox" name="applicationEndTime"/>
+    </div>
+
+    <div class="search-form-item col-md-3">
+        <a href="javascript:void(0)" onclick="refreshCompanyCircle()" class="easyui-linkbutton primary">查询</a>
+    </div>
+</div>
+
+<div class="clear"></div>
+<div class="super-theme-example">
+    <div style="height: 340px;">
+        <table id="companyCircleTab"></table>
+    </div>
+
+    <div id="companyCircleDetailWin" style="display: none;padding-top:30px;" title="关联企业审批详情">
+        <div class="form-item col-md-12">
+            <label class="label-top col-md-1">圈子名称：</label>
+            <label class="label-top circleNameLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top col-md-1">圈子人数：</label>
+            <label class="label-top memberCntLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top col-md-1">圈子公告：</label>
+            <label class="label-top publicContentLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top col-md-1">圈子标签：</label>
+            <label class="label-top circleLabelsLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top col-md-1">申请时间：</label>
+            <label class="label-top applicationTimeLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top col-md-1">申请账号：</label>
+            <label class="label-top applicationUserNameLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <label class="label-top col-md-1">审核状态：</label>
+            <label class="label-top reviewStatusLabel"></label>
+        </div>
+
+        <div class="form-item col-md-12">
+            <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="closeCompanyCircleDetail()">关闭</a>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    ;(function ($, window, document, undefined){
+
+        $('#companyCircleTab').datagrid({
+            url: App.href + '/api/company/companyCircle/list',
+            fit: true,
+            pagination: true,
+            fitColumns: true,
+            method: 'GET',
+            pageSize: 10,
+            pageList: [10, 25, 50, 100, 200],
+            height: 340,
+            queryParams: {},
+            toolbar: [],
+            loadFilter: function(data) {
+                if (data.code === 401) {
+                    App.showMsg('token失效,请登录!');
+                    window.location.href = App.href + '/login.html';
+                    return {"total":0, "rows": "[]"};
+                } else {
+                    return data;
+                }
+            },
+            onBeforeLoad: function (param) {
+                var circleName = $("input[name=circleName]").val();
+                var reviewStatus = $("input[name=reviewStatus]").val();
+                var applicationStartTime = $("input[name=applicationStartTime]").val();
+                var applicationEndTime = $("input[name=applicationEndTime]").val();
+
+                param.circleName = circleName;
+                param.reviewStatus = reviewStatus;
+                param.applicationStartTime = applicationStartTime;
+                param.applicationEndTime = applicationEndTime;
+            },
+            columns: [
+                [{
+                    field: 'id',
+                    title: '序号',
+                    sortable: true,
+                    width: 50
+                }, {
+                    field: 'circleName',
+                    title: '圈子名称',
+                    width: 50
+                }, {
+                    field: 'memberCnt',
+                    title: '圈子人数',
+                    width: 50
+                }, {
+                    field: 'publicContent',
+                    title: '圈子公告',
+                    width: 50
+                }, {
+                    field: 'circleLabels',
+                    title: '圈子标签',
+                    width: 50
+                }, {
+                    field: 'applicationTime',
+                    title: '申请时间',
+                    width: 80
+                }, {
+                    field: 'applicationUserName',
+                    title: '申请账号',
+                    width: 50
+                }, {
+                    field: 'reviewStatus',
+                    title: '审核状态',
+                    width: 50,
+                    formatter: function(value, row, index) {
+                        var reviewStatusName = "未审核";
+                        if(row.reviewStatus == 1) {
+                            reviewStatusName = "已审核";
+                        }
+
+                        return reviewStatusName;
+                    }
+                }, {
+                    field: 'custom_col1',
+                    title: '操作',
+                    width: 80,
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var btns = new Array();
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showCompanyCircle(' + row.id + ')">查看</a>&nbsp;');
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="reviewCompanyCircle('+ row.id +', 1)">通过</a>&nbsp;');
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="reviewCompanyCircle('+ row.id +', 2)">不通过</a>&nbsp;');
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="disableCompanyCircle('+ row.id +', 1)">取消关联</a>');
+                        return btns.join('');
+                    }
+                }]
+            ]
+        });
+    })(jQuery, window, document);
+
+
+    function refreshCompanyCircle() {
+        $('#companyCircleTab').datagrid('reload');
+    }
+
+    /**
+     * 添加公司角色
+     *
+     */
+    function addCompanyCircle() {
+        $('#companyCircleWin').window({
+            width: "80%",
+            height: "80%",
+            modal:true
+        });
+    }
+
+    /**
+     * 审核公司酷玩圈关联
+     *
+     * @param id
+     * @param status
+     */
+    function reviewCompanyCircle(id, status) {
+        var statusStr = "通过";
+        if(status == 2) {
+            statusStr = "不通过";
+        }
+        $.messager.confirm('确认', '您确认想要'+ statusStr +'吗？', function(r) {
+            if(r) {
+                if(status == 2) {
+                    $.messager.prompt('提示信息', '请输入不通过原因：', function(rejectReason) {
+                        if(rejectReason) {
+                            App.getRequestData('/api/company/companyCircle/updateCompanyCircle', {'id': id, 'status': status, 'rejectReason': rejectReason}, function(data){
+                                App.showMsg(statusStr + '操作成功');
+                                refreshCompanyCircle();
+                            });
+                        }
+                    });
+                } else {
+
+                    App.getRequestData('/api/company/companyCircle/updateCompanyCircle', {'id': id, 'status': status, 'rejectReason': ''}, function(data){
+                        App.showMsg(statusStr + '操作成功');
+                        refreshCompanyCircle();
+                    });
+                }
+            }
+        });
+    }
+
+    /**
+     * 公司酷玩圈取消关联
+     *
+     * @param id
+     * @param isDisable
+     */
+    function disableCompanyCircle(id, isDisable) {
+        $.messager.confirm('确认', '您确认想要取消关联吗？', function(r) {
+            if(r) {
+                $.messager.prompt('提示信息', '请输入取消关联原因：', function(disableReason) {
+                    if(disableReason) {
+                        App.getRequestData('/api/company/companyCircle/updateCompanyCircleDisable', {'id': id, 'isDisable': isDisable, 'disableReason': disableReason}, function(data){
+                            App.showMsg('取消关联操作成功');
+                            refreshCompanyCircle();
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * 展示公司酷玩圈
+     *
+     * @param id
+     */
+    function showCompanyCircle(id) {
+        $('#companyCircleDetailWin').window({
+            width: "80%",
+            height: "80%",
+            modal:true
+        });
+
+        App.getRequestData('/api/company/companyCircle/getCompanyCircle', {'id': id}, function(data){
+            $(".circleNameLabel").text(data.circleName);
+            $(".memberCntLabel").text(data.memberCnt);
+            $(".publicContentLabel").text(data.publicContent);
+            $(".circleLabelsLabel").text(data.circleLabels);
+            $(".applicationTimeLabel").text(data.applicationTime);
+            $(".applicationUserNameLabel").text(data.applicationUserName);
+            $(".reviewStatusLabel").text(data.reviewStatus);
+        });
+    }
+
+    /**
+     * 关闭审批详情窗口
+     */
+    function closeCompanyCircleDetail() {
+        $('#companyCircleDetailWin').window('close');
+    }
+
+</script>
+</body>
+</html>
