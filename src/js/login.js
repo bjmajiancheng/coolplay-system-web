@@ -3,12 +3,12 @@
  */
 ;
 (function ($, window, document, undefined) {
-    var vkey = "company_" + new Date().getTime() + "_" + Math.floor(Math.random() * 10);
+    var vkey = "system_" + new Date().getTime() + "_" + Math.floor(Math.random() * 10);
 
     function initLogin() {
         $("#captcha_img").attr("src", App.href + "/api/noneAuth/captcha?vkey=" + vkey);
         $("#captcha_a").on("click", function () {
-            vkey = "company_" + new Date().getTime() + "_" + Math.floor(Math.random() * 10);
+            vkey = "system_" + new Date().getTime() + "_" + Math.floor(Math.random() * 10);
             $("#captcha_img").attr("src", App.href + "/api/noneAuth/captcha?vkey=" + vkey + "&s=" + new Date().getTime());
         });
         $('#username,#password,#vcode').bind('keypress', function (event) {
@@ -63,7 +63,7 @@
             data: fields,
             success: function (result) {
                 if (result.code === 200) {
-                    $.cookie('coolplay_company_token', result.token, {expires: 7});
+                    $.cookie('coolplay_system_token', result.token, {expires: 7});
                     window.location.href = App.href + "/index.html";
                 } else {
                     alertValidate(result.message);
