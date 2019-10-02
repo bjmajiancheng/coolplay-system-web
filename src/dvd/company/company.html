@@ -2,80 +2,212 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>企业注册信息</title>
+    <title>注册企业列表</title>
 </head>
 <body>
-<h2 style="font-size: 25px; margin: 15px;" class="align_center">企业注册信息</h2>
 <div class="super-theme-example">
-    <form id="companyDetailForm" method="post">
-        <input type="hidden" name="id">
-        <div class="form-item col-md-5">
-            <label class="label-top">公司名称：</label>
-            <input id="companyDetail_companyName" name="companyName" class="easyui-validatebox easyui-textbox" prompt="请输入公司名称" data-options="required:true, missingMessage:'请输入公司名称'">
-        </div>
+    <div class="search-form-item col-md-4">
+        <label class="label-top">用户账号：</label>
+        <input name="userName" class="easyui-validatebox easyui-textbox" prompt="请输入用户账号">
+    </div>
 
-        <div class="form-item col-md-5">
-            <label class="label-top">联系人：</label>
-            <input id="companyDetail_contactName" name="contactName" class="easyui-validatebox easyui-textbox" prompt="请输入联系人" data-options="required:true, missingMessage:'请输入联系人'">
-        </div>
+    <div class="search-form-item col-md-4">
+        <label class="label-top">绑定电话：</label>
+        <input name="contactMobile" class="easyui-validatebox easyui-textbox" prompt="请输入绑定电话">
+    </div>
+    <div class="search-form-item col-md-3">
+        <a href="javascript:void(0)" onclick="refreshCompany()" class="easyui-linkbutton primary">查询</a>
+    </div>
+</div>
 
-        <div class="form-item col-md-5">
-            <label class="label-top">电话：</label>
-            <input id="companyDetail_contactMobile" name="contactMobile" class="easyui-validatebox easyui-textbox" prompt="请输入电话" data-options="required:true, missingMessage:'请输入电话'">
-        </div>
+<div class="clear"></div>
 
-        <div class="form-item col-md-5">
-            <label class="label-top">地址：</label>
-            <input id="companyDetail_contactAddress" name="contactAddress" class="easyui-validatebox easyui-textbox" prompt="请输入地址" data-options="required:true, missingMessage:'请输入地址'">
-        </div>
+<div class="super-theme-example">
+    <div style="height: 340px;">
+        <table id="companyTab"></table>
+    </div>
 
-        <div class="form-item col-md-5">
-            <label class="label-top">主营项目：</label>
-            <input id="companyDetail_majorProject" name="majorProject" class="easyui-validatebox easyui-textbox" prompt="请输入主营项目" data-options="required:true, missingMessage:'请输入主营项目'">
-        </div>
+    <div id="companyDetailWin" style="display: none;padding-top:30px;" title="企业注册信息">
+        <h2 style="font-size: 25px; margin: 15px;" class="align_center">企业注册信息</h2>
 
-        <div class="form-item col-md-5">
-            <label class="label-top">法人身份证号码：</label>
-            <input id="companyDetail_legalIdcard" name="legalIdcard" class="easyui-validatebox easyui-textbox" prompt="请输入法人身份证号码" data-options="required:true, missingMessage:'请输入法人身份证号码'">
-        </div>
-
-        <div class="form-item col-md-10" style="height:300px;">
-            <label class="label-top">公司简介：</label>
-
-            <input type="hidden" name="companyDesc"/>
-
-            <div class="easyui-texteditor" id="companyDetail_companyDescDiv" title="公司简介" style="width:90%;height:300px;padding:20px;left:126px;top:0px;">
-
-            </div>
-            <!--<input id="companyDetail_companyDesc" name="companyDesc" class="easyui-validatebox easyui-textbox" prompt="请输入公司简介" data-options="required:true, missingMessage:'请输入公司简介'">-->
-        </div>
-
-        <div class="form-item col-md-5">
-            <label class="label-top" style="float:left;">营业执照附件：</label>
-            <div id="businessLicenseUrlDiv" style="float:left;">
-            </div>
-        </div>
-
-        <div class="form-item col-md-10">
-            <label class="label-top" style="float:left;">身份证正反面照片：</label>
-            <div id="idcardPositivePhotoDiv" style="float:left;">
+        <form id="companyDetailForm" method="post">
+            <input type="hidden" name="id">
+            <div class="form-item col-md-5">
+                <label class="label-top">公司名称：</label>
+                <input id="companyDetail_companyName" name="companyName" class="easyui-validatebox easyui-textbox" prompt="请输入公司名称" data-options="required:true, missingMessage:'请输入公司名称'">
             </div>
 
-            <div id="idcardNegativePhotoDiv" style="float:left;margin-left:10px;">
+            <div class="form-item col-md-5">
+                <label class="label-top">联系人：</label>
+                <input id="companyDetail_contactName" name="contactName" class="easyui-validatebox easyui-textbox" prompt="请输入联系人" data-options="required:true, missingMessage:'请输入联系人'">
             </div>
-        </div>
 
-        <div class="clear"></div>
+            <div class="form-item col-md-5">
+                <label class="label-top">电话：</label>
+                <input id="companyDetail_contactMobile" name="contactMobile" class="easyui-validatebox easyui-textbox" prompt="请输入电话" data-options="required:true, missingMessage:'请输入电话'">
+            </div>
 
-        <div class="form-item col-md-10 align_center">
-            <a href="javascript:void(0)" onclick="updateCompany()" class="easyui-linkbutton primary">提交修改</a>
-        </div>
-    </form>
+            <div class="form-item col-md-5">
+                <label class="label-top">地址：</label>
+                <input id="companyDetail_contactAddress" name="contactAddress" class="easyui-validatebox easyui-textbox" prompt="请输入地址" data-options="required:true, missingMessage:'请输入地址'">
+            </div>
+
+            <div class="form-item col-md-5">
+                <label class="label-top">主营项目：</label>
+                <input id="companyDetail_majorProject" name="majorProject" class="easyui-validatebox easyui-textbox" prompt="请输入主营项目" data-options="required:true, missingMessage:'请输入主营项目'">
+            </div>
+
+            <div class="form-item col-md-5">
+                <label class="label-top">法人身份证号码：</label>
+                <input id="companyDetail_legalIdcard" name="legalIdcard" class="easyui-validatebox easyui-textbox" prompt="请输入法人身份证号码" data-options="required:true, missingMessage:'请输入法人身份证号码'">
+            </div>
+
+            <div class="form-item col-md-10" style="height:300px;">
+                <label class="label-top">公司简介：</label>
+
+                <input type="hidden" name="companyDesc"/>
+
+                <div class="easyui-texteditor" id="companyDetail_companyDescDiv" title="公司简介" style="width:90%;height:300px;padding:20px;left:126px;top:0px;">
+
+                </div>
+            </div>
+
+            <div class="form-item col-md-5">
+                <label class="label-top" style="float:left;">营业执照附件：</label>
+                <div id="businessLicenseUrlDiv" style="float:left;">
+                </div>
+            </div>
+
+            <div class="form-item col-md-10">
+                <label class="label-top" style="float:left;">身份证正反面照片：</label>
+                <div id="idcardPositivePhotoDiv" style="float:left;">
+                </div>
+
+                <div id="idcardNegativePhotoDiv" style="float:left;margin-left:10px;">
+                </div>
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="form-item col-md-10 align_center">
+                <a href="javascript:void(0)" onclick="updateCompany()" class="easyui-linkbutton primary">提交修改</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="super-theme-example">
+
 </div>
 
 <script type="text/javascript">
     ;(function ($, window, document, undefined){
-        App.getRequestData('/api/common/company/companyInfo', {}, function(data) {
+
+        $('#companyTab').datagrid({
+            url: App.href + '/api/system/company/list',
+            fit: true,
+            pagination: true,
+            fitColumns: true,
+            method: 'GET',
+            pageSize: 10,
+            pageList: [10, 25, 50, 100, 200],
+            height: 340,
+            queryParams: {},
+            toolbar: [],
+            loadFilter: function(data) {
+                if (data.code === 401) {
+                    App.showMsg('token失效,请登录!');
+                    window.location.href = App.href + '/login.html';
+                    return {"total":0, "rows": "[]"};
+                } else {
+                    return data;
+                }
+            },
+            onBeforeLoad: function (param) {
+                var userName = $("input[name=userName]").val();
+                var contactMobile = $("input[name=contactMobile]").val();
+
+                param.userName = userName;
+                param.contactMobile = contactMobile;
+            },
+            columns: [
+                [{
+                    field: 'id',
+                    title: '用户账号',
+                    sortable: true,
+                    width: 50
+                }, {
+                    field: 'circleName',
+                    title: 'B用户名称',
+                    width: 50
+                }, {
+                    field: 'contactMobile',
+                    title: '绑定电话',
+                    width: 50
+                }, {
+                    field: 'publicContent',
+                    title: 'B用户类型',
+                    width: 50
+                }, {
+                    field: 'circleLabels',
+                    title: '地图显示',
+                    width: 50
+                }, {
+                    field: 'reviewStatus',
+                    title: '审核状态',
+                    width: 80,
+                    formatter: function(value, row, index) {
+                        var reviewStatusName = "未审核";
+                        if(row.reviewStatus == 1) {
+                            reviewStatusName = "已审核";
+                        }
+
+                        return reviewStatusName;
+                    }
+                }, {
+                    field: 'status',
+                    title: '审核结果',
+                    width: 50,
+                    formatter: function(value, row, index) {
+                        var statusStr = "未审核";
+                        if(row.status == 1) {
+                            statusStr = "审核通过";
+                        } else if(row.status == 2) {
+                            statusStr = "审核驳回";
+                        }
+
+                        return statusStr;
+                    }
+                }, {
+                    field: 'rejectReason',
+                    title: '审批理由',
+                    width: 50
+                }, {
+                    field: 'custom_col1',
+                    title: '操作',
+                    width: 80,
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var btns = new Array();
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showCompany('+ row.id +', 1)">查看</a>');
+                        return btns.join('');
+                    }
+                }]
+            ]
+        });
+
+    })(jQuery, window, document);
+
+
+    function showCompany(id) {
+        $('#companyDetailWin').window({
+            width:600,
+            height:400,
+            modal:true
+        });
+
+        App.getRequestData('/api/company/companyInfo', {'id': id}, function(data) {
             $("#companyDetailForm").find("input[name=id]").val(data.id);
             $("#companyDetail_companyName").textbox('setValue', data.companyName);
             $("#companyDetail_contactName").textbox('setValue', data.contactName);
@@ -96,7 +228,7 @@
         });
 
         $('#companyDetailForm').form({
-            url: App.href + '/api/common/company/updateCompany',
+            url: App.href + '/api/company/updateCompany',
             method: 'POST',
             onSubmit:function(){
                 return $(this).form('validate');
@@ -120,8 +252,7 @@
 
         var businessLicenseUrlEle = App.uploadImage({id:"businessLicenseUrl", name: 'businessLicenseUrl', isAjaxUpload: true, autoUpload: true});
         $('#businessLicenseUrlDiv').append(businessLicenseUrlEle);
-
-    })(jQuery, window, document);
+    }
 
     function updateCompany() {
         var idcardPositivePhoto = $("#companyDetailForm").find("input[name=idcardPositivePhoto]").val();

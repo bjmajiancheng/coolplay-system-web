@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>标签管理</title>
+</head>
+<body>
+<div class="super-theme-example">
+    <div class="search-form-item col-md-4">
+        <label class="label-top">标签名称：</label>
+        <input name="labelName" class="easyui-validatebox easyui-textbox" prompt="请输入标签名称">
+    </div>
+
+    <div class="search-form-item col-md-4">
+        <label class="label-top">所属分类：</label>
+        <input name="catId" class="easyui-validatebox easyui-textbox" prompt="请输入所属分类">
+    </div>
+
+    <div class="search-form-item col-md-3">
+        <a href="javascript:void(0)" onclick="refreshLabelTab()" class="easyui-linkbutton primary">查询</a>
+        <a href="javascript:void(0)" onclick="addLabel()" class="easyui-linkbutton primary">添加标签</a>
+    </div>
+</div>
+
+<div class="clear"></div>
+<div class="super-theme-example">
+    <div style="height: 400px;">
+        <table id="labelTab"></table>
+    </div>
+
+    <div id="labelWin" style="display: none;padding-top:30px;padding-left:100px;" title="新增标签">
+        <form id="labelForm" method="post">
+            <input name="id" type="hidden" />
+            <div class="form-item col-md-10">
+                <label class="label-top">标签名称：</label>
+                <input id="label_labelName" class="easyui-validatebox easyui-textbox" prompt="请输入标签名称" name="labelName" data-options="required:true, missingMessage:'请输入标签名称'">
+            </div>
+
+            <div class="form-item col-md-10">
+                <label class="label-top">所属分类：</label>
+                <input id="label_catId" class="easyui-validatebox easyui-textbox" prompt="请输入所属分类" name="catId" data-options="required:true, missingMessage:'请输入所属分类'">
+            </div>
+
+            <div class="form-item col-md-10">
+                <label class="label-top">状态：</label>
+                <input id="label_status" class="easyui-validatebox easyui-textbox" prompt="请输入状态" name="status" data-options="required:true, missingMessage:'请输入状态'">
+            </div>
+
+            <div class="form-item col-md-10">
+                <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="saveLabel()">保存</a>
+                <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="closeLabelWin()">取消</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    ;(function ($, window, document, undefined){
+        $('#labelTab').datagrid({
+            url: App.href + '/api/common/label/list',
+            fit: true,
+            pagination: true,
+            fitColumns: true,
+            method: 'GET',
+            pageSize: 10,
+            pageList: [10, 25, 50, 100, 200],
+            height: 400,
+            queryParams: {},
+            toolbar: [],
+            loadFilter: function(data) {
+                if (data.code === 401) {
+                    App.showMsg('token失效,请登录!');
+                    window.location.href = App.href + '/login.html';
+                    return {"total":0, "rows": "[]"};
+                } else {
+                    return data;
+                }
+            },
+            onBeforeLoad: function (param) {
+                var labelName = $("input[name=labelName]").val();
+                var catId = $("input[name=catId]").val();
+
+                param.labelName = labelName;
+                param.catId = catId;
+            },
+            columns: [
+                [{
+                    field: 'id',
+                    title: '序号',
+                    sortable: true,
+                    width: 50
+                }, {
+                    field: 'labelName',
+                    title: '标签名称',
+                    width: 50
+                }, {
+                    field: 'catName',
+                    title: '所属分类',
+                    width: 50
+                }, {
+                    field: 'ctime',
+                    title: '创建时间',
+                    width: 50
+                }, {
+                    field: 'creator',
+                    title: '创建人',
+                    width: 50
+                }, {
+                    field: 'status',
+                    title: '状态',
+                    width: 50,
+                    formatter: function(value, row, index) {
+                        var statusStr = "正常显示";
+                        if(row.status == 1) {
+                            statusStr = "不显示";
+                        }
+
+                        return statusStr;
+                    }
+                }, {
+                    field: 'custom_col1',
+                    title: '操作',
+                    width: 50,
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var btns = new Array();
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="delLabel(' + row.id + ')">删除</a>&nbsp;');
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showLabel(' + row.id + ')">查看</a>');
+                        return btns.join('');
+                    }
+                }]
+            ]
+        });
+
+    })(jQuery, window, document);
+
+
+    function refreshLabelTab() {
+        $('#labelTab').datagrid('reload');
+    }
+
+    /**
+     * 添加标签
+     */
+    function addLabel() {
+        $("#labelWin").window({
+            width: "80%",
+            height: "80%",
+            modal:true
+        });
+
+
+    }
+
+    /**
+     * 删除标签
+     *
+     * @param id
+     */
+    function delLabel(id) {
+
+    }
+
+    /**
+     * 查看标签
+     *
+     * @param id
+     */
+    function showLabel(id) {
+
+    }
+
+    /**
+     * 保存标签
+     */
+    function saveLabel() {
+
+    }
+
+    /**
+     * 关闭新增标签窗口
+     */
+    function closeLabelWin() {
+
+    }
+
+</script>
+</body>
+</html>

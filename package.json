@@ -1,7 +1,7 @@
 {
-  "name": "coolplay-company-web",
+  "name": "coolplay-system-web",
   "version": "1.1.0",
-  "description": "coolplay-company-web",
+  "description": "coolplay-system-web",
   "main": "index.js",
   "license": "ISC",
   "devDependencies": {

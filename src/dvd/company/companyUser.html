@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>企业账号管理</title>
+</head>
+<body>
+<div class="super-theme-example companyLogSearch">
+    <div class="search-form-item col-md-4">
+        <label class="label-top">企业名称：</label>
+        <input name="companyName" class="easyui-validatebox easyui-textbox" prompt="请输入企业名称">
+    </div>
+
+    <div class="search-form-item col-md-4">
+        <label class="label-top">企业用户账号：</label>
+        <input name="userName" class="easyui-validatebox easyui-textbox" prompt="请输入企业用户账号">
+    </div>
+
+    <div class="search-form-item col-md-4">
+        <label class="label-top">绑定电话：</label>
+        <input name="contactMobile" class="easyui-validatebox easyui-textbox" prompt="请输入绑定电话">
+    </div>
+
+
+    <div class="search-form-item col-md-3">
+        <a href="javascript:void(0)" onclick="refreshCompanyLog()" class="easyui-linkbutton primary">查询</a>
+    </div>
+</div>
+
+<div class="clear"></div>
+
+<div class="super-theme-example">
+    <div style="height: 400px;">
+        <table id="companyUserTab"></table>
+    </div>
+
+    <div id="companyLoginLogWin" style="display: none;padding-top:30px;padding-left:100px;" title="登录日志">
+        <table id="companyLoginLogTab"></table>
+    </div>
+</div>
+
+<script type="text/javascript">
+    ;(function ($, window, document, undefined){
+        $('#companyUserTab').datagrid({
+            url: App.href + '/api/company/companyLog/list',
+            fit: true,
+            pagination: true,
+            fitColumns: true,
+            method: 'GET',
+            pageSize: 10,
+            pageList: [10, 25, 50, 100, 200],
+            height: 400,
+            queryParams: {},
+            toolbar: [],
+            loadFilter: function(data) {
+                if (data.code === 401) {
+                    App.showMsg('token失效,请登录!');
+                    window.location.href = App.href + '/login.html';
+                    return {"total":0, "rows": "[]"};
+                } else {
+                    return data;
+                }
+            },
+            onBeforeLoad: function (param) {
+                var companyName = $(".companyLogSearch").find("input[name=companyName]").val();
+                var userName = $(".companyLogSearch").find("input[name=userName]").val();
+                var contactMobile = $(".companyLogSearch").find("input[name=contactMobile]").val();
+
+
+                param.companyName = companyName;
+                param.userName = userName;
+                param.contactMobile = contactMobile;
+            },
+            columns: [
+                [{
+                    field: 'id',
+                    title: '企业用户账号',
+                    sortable: true,
+                    width: 50
+                }, {
+                    field: 'roleName',
+                    title: '企业名称',
+                    width: 50
+                }, {
+                    field: 'ctime',
+                    title: '绑定电话',
+                    width: 50
+                }, {
+                    field: 'custom_col1',
+                    title: '登录日志',
+                    width: 50,
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var btns = new Array();
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="">登录日志</a>');
+                        return btns.join('');
+                    }
+                }, {
+                    field: 'custom_col2',
+                    title: '操作',
+                    width: 50,
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var btns = new Array();
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="enabledUser()">启用</a>&nbsp;');
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="disableUser()">禁用</a>&nbsp;');
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showUser()">查看</a>&nbsp;');
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="delUser()">删除</a>&nbsp;');
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="editUser()">修改</a>');
+                        return btns.join('');
+                    }
+                }]
+            ]
+        });
+
+
+
+    })(jQuery, window, document);
+
+    function refreshCompanyLog() {
+        $('#companyUserTab').datagrid('reload');
+    }
+
+    /**
+     * 查看登录日志
+     * @param companyId
+     */
+    function showLoginLog(companyId) {
+        $("#companyLoginLogWin").window({
+            width: "80%",
+            height: "80%",
+            modal:true
+        });
+
+        $('#companyLoginLogTab').datagrid({
+            url: App.href + '/api/company/companyLog/loginLogList',
+            fit: true,
+            pagination: true,
+            fitColumns: true,
+            method: 'GET',
+            pageSize: 10,
+            pageList: [10, 25, 50, 100, 200],
+            height: 400,
+            queryParams: {},
+            toolbar: [],
+            loadFilter: function(data) {
+                if (data.code === 401) {
+                    App.showMsg('token失效,请登录!');
+                    window.location.href = App.href + '/login.html';
+                    return {"total":0, "rows": "[]"};
+                } else {
+                    return data;
+                }
+            },
+            onBeforeLoad: function (param) {
+                param.companyId = companyId;
+            },
+            columns: [
+                [{
+                    field: 'userName',
+                    title: 'B用户名称',
+                    sortable: true,
+                    width: 50
+                }, {
+                    field: 'ctime',
+                    title: '时间',
+                    width: 50
+                }, {
+                    field: 'ip',
+                    title: 'IP',
+                    width: 50
+                }]
+            ]
+        });
+    }
+
+    /**
+     * 关闭登录日志窗口
+     */
+    function closeLoginLog() {
+        $('#companyLoginLogWin').window('close');
+    }
+
+    /**
+     * 启用用户
+     */
+    function enabledUser(userId) {
+
+    }
+
+    /**
+     * 禁用用户
+     */
+    function disableUser(userId) {
+
+    }
+
+    /**
+     * 查看用户
+     */
+    function showUser(userId) {
+
+    }
+
+    /**
+     * 删除用户
+     */
+    function delUser(userId) {
+
+    }
+
+    /**
+     * 修改用户
+     */
+    function editUser(userId) {
+
+    }
+</script>
+</body>
+</html>

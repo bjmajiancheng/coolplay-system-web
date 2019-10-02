@@ -4,8 +4,6 @@
 ;
 (function ($, window, document, undefined) {
     window.App = {
-        //href: "http://ops.platform.chenjz.com",
-        //href: "http://platform.ops.vyohui.com",
         href: window.location.origin,
         requestMapping: {}
     };

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>帖子列表</title>
+</head>
+<body>
+<div class="super-theme-example">
+    <div class="search-form-item col-md-4">
+        <label class="label-top">帖子标题：</label>
+        <input name="postTitle" class="easyui-validatebox easyui-textbox" prompt="请输入帖子标题">
+    </div>
+
+    <div class="search-form-item col-md-4">
+        <label class="label-top">发布用户：</label>
+        <input name="userName" class="easyui-validatebox easyui-textbox" prompt="请输入发布用户">
+    </div>
+
+    <div class="search-form-item col-md-4">
+        <label class="label-top">标签：</label>
+        <input name="labelName" class="easyui-validatebox easyui-textbox" prompt="请输入标签">
+    </div>
+
+    <div class="search-form-item col-md-4">
+        <label class="label-top">置顶：</label>
+        <select id="isTop" class="easyui-combobox" data-options="editable:false,panelHeight:null" name="isTop">
+            <option value="">请选择</option>
+            <option value="1">是</option>
+            <option value="0">否</option>
+        </select>
+    </div>
+
+
+    <div class="search-form-item col-md-3">
+        <a href="javascript:void(0)" onclick="refreshPost()" class="easyui-linkbutton primary">查询</a>
+    </div>
+</div>
+
+<div class="clear"></div>
+
+<div class="super-theme-example">
+    <div style="height: 400px;">
+        <table id="postTab"></table>
+    </div>
+
+    <div id="postCommentWin" style="display: none;padding-top:30px;padding-left:100px;" title="评论列表">
+        <div class="super-theme-example">
+            <div class="search-form-item col-md-4">
+                <label class="label-top">帖子标题：</label>
+                <label class="label-top postComment_PostTitleLabel"></label>
+            </div>
+
+            <div class="search-form-item col-md-4">
+                <label class="label-top">发布用户：</label>
+                <label class="label-top postComment_userNameLabel"></label>
+            </div>
+
+            <div class="search-form-item col-md-4">
+                <label class="label-top">评论内容：</label>
+                <input name="commentContent" class="easyui-validatebox easyui-textbox" prompt="请输入评论内容">
+            </div>
+
+            <div class="search-form-item col-md-3">
+                <a href="javascript:void(0)" onclick="refreshPostComment()" class="easyui-linkbutton primary">查询</a>
+            </div>
+        </div>
+
+        <div class="clear"></div>
+        <table id="postCommentTab"></table>
+    </div>
+
+    <div id="postDetailWin" style="display: none;padding-top:30px;padding-left:100px;" title="帖子详情">
+        <div class="easyui-layout" style="width:100%;height:400px;">
+            <div data-options="region:'west',title:'',split:true" style="width:100px;">
+                <div class="search-form-item col-md-4">
+                    <li class="user">
+                        <span class="user-icon"><img src="../../cdn/img/favicon.png"/></span>
+                        <span>Windr</span>
+                    </li>
+                </div>
+
+                <div class="search-form-item col-md-4">
+                    <label class="label-top">标题：</label>
+                    <label class="label-top postTitleLabel"></label>
+                </div>
+                <div class="search-form-item col-md-4">
+                    <label class="label-top">日期：</label>
+                    <label class="label-top ctimeLabel"></label>
+                </div>
+                <div class="search-form-item col-md-4">
+                    <label class="label-top">用户名：</label>
+                    <label class="label-top userNameLabel"></label>
+                </div>
+            </div>
+            <div data-options="region:'center',title:''" style="padding:5px;">
+                <div class="postDetail_postContent">
+
+                </div>
+            </div>
+        </div>
+
+        <div class="form-item col-md-10">
+            <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="closePostDetailWin()">关闭</a>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    ;(function ($, window, document, undefined){
+        $('#postTab').datagrid({
+            url: App.href + '/api/post/post/list',
+            fit: true,
+            pagination: true,
+            fitColumns: true,
+            method: 'GET',
+            pageSize: 10,
+            pageList: [10, 25, 50, 100, 200],
+            height: 400,
+            queryParams: {},
+            toolbar: [],
+            loadFilter: function(data) {
+                if (data.code === 401) {
+                    App.showMsg('token失效,请登录!');
+                    window.location.href = App.href + '/login.html';
+                    return {"total":0, "rows": "[]"};
+                } else {
+                    return data;
+                }
+            },
+            onBeforeLoad: function (param) {
+                var postTitle = $("input[name=postTitle]").val();
+                var userName = $("input[name=userName]").val();
+                var labelName = $("input[name=labelName]").val();
+                var isTop = $("input[name=isTop]").val();
+
+                param.postTitle = postTitle;
+                param.userName = userName;
+                param.labelName = labelName;
+                param.isTop = isTop;
+            },
+            columns: [
+                [{
+                    field: 'id',
+                    title: '编号',
+                    sortable: true,
+                    width: 50
+                }, {
+                    field: 'postTitle',
+                    title: '标题',
+                    width: 50
+                }, {
+                    field: 'isTop',
+                    title: '置顶',
+                    width: 50,
+                    formatter: function(value, row, index) {
+                        var isTopStr = "否";
+                        if(row.isTop == 1) {
+                            isTopStr = "是";
+                        }
+
+                        return isTopStr;
+                    }
+                }, {
+                    field: 'userName',
+                    title: '发布用户',
+                    width: 50
+                }, {
+                    field: 'ctime',
+                    title: '发布时间',
+                    width: 50
+                }, {
+                    field: 'custom_col1',
+                    title: '相关',
+                    width: 50,
+                    formatter: function(value, row, index) {
+                        var html = [];
+                        html.push('点赞：');
+                        html.push(row.likeCnt);
+                        html.push('<br />');
+                        html.push('阅读：');
+                        html.push(row.readCnt);
+                        html.push('<br />');
+                        html.push('评论：');
+                        html.push(row.commentCnt);
+                        html.push('<br />');
+
+                        return html;
+                    }
+                }, {
+                    field: 'custom_col2',
+                    title: '操作',
+                    width: 50,
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var btns = new Array();
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showPost('+ row.id +')">查看</a>&nbsp;');
+
+                        if(row.isTop == 1) {
+                            btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="canalTopPost('+ row.id +')">取消置顶</a>&nbsp;');
+                        } else {
+                            btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="topPost('+ row.id +')">置顶</a>&nbsp;');
+                        }
+
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showPostCommentList(' + row.id + ')">评论列表</a>&nbsp;');
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="delPost(' + row.id + ')">删除</a>');
+                        return btns.join('');
+                    }
+                }]
+            ]
+        });
+    })(jQuery, window, document);
+
+
+    /**
+     * 刷新帖子
+     */
+    function refreshPost() {
+        $('#postTab').datagrid('reload');
+    }
+
+    /**
+     * 刷新帖子评论列表
+     */
+    function refreshPostComment() {
+        $('#postCommentTab').datagrid('reload');
+    }
+
+    /**
+     * 评论列表
+     * @param postId
+     */
+    function showPostCommentList(postId) {
+        $('#postCommentTab').datagrid({
+            url: App.href + '/api/post/postComment/list',
+            fit: true,
+            pagination: true,
+            fitColumns: true,
+            method: 'GET',
+            pageSize: 10,
+            pageList: [10, 25, 50, 100, 200],
+            height: 400,
+            queryParams: {},
+            toolbar: [],
+            loadFilter: function(data) {
+                if (data.code === 401) {
+                    App.showMsg('token失效,请登录!');
+                    window.location.href = App.href + '/login.html';
+                    return {"total":0, "rows": "[]"};
+                } else {
+                    return data;
+                }
+            },
+            onBeforeLoad: function (param) {
+                var commentContent = $("input[name=commentContent]").val();
+
+                param.commentContent = commentContent;
+                param.postId = postId;
+            },
+            columns: [
+                [{
+                    field: 'id',
+                    title: '编号',
+                    sortable: true,
+                    width: 50
+                }, {
+                    field: 'postTitle',
+                    title: '评论内容',
+                    width: 50
+                }, {
+                    field: 'isTop',
+                    title: '评论用户',
+                    width: 50
+                }, {
+                    field: 'userName',
+                    title: '评论时间',
+                    width: 50
+                }, {
+                    field: 'custom_col1',
+                    title: '操作',
+                    width: 50,
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var btns = new Array();
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="delComment('+ row.id +')">删除</a>');
+                        return btns.join('');
+                    }
+                }]
+            ]
+        });
+    }
+
+    /**
+     * 查看帖子
+     */
+    function showPost(id) {
+        App.getRequestData('/api/post/post/showPost', {id: id}, function(data) {
+
+        });
+    }
+
+    /**
+     * 取消置顶帖子
+     */
+    function canalTopPost(id) {
+        App.getRequestData('/api/post/post/canalTopPost', {id: id}, function(data) {
+
+        });
+    }
+
+    /**
+     * 置顶帖子
+     */
+    function topPost(id) {
+        App.getRequestData('/api/post/post/topPost', {id: id}, function(data) {
+
+        });
+    }
+
+    /**
+     * 删除帖子
+     */
+    function delPost(id) {
+        App.getRequestData('/api/post/post/delPost', {id: id}, function(data) {
+
+        });
+    }
+
+    /**
+     * 删除评论
+     * @param id
+     */
+    function delComment(id) {
+        App.getRequestData('/api/post/postComment/delComment', {id: id}, function(data) {
+
+        });
+    }
+
+    /**
+     * 关闭帖子详情弹框
+     */
+    function closePostDetailWin() {
+        $('#postDetailWin').window('close');
+    }
+
+</script>
+</body>
+</html>

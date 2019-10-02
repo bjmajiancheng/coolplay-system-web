@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>广告位管理</title>
+</head>
+<body>
+<div class="super-theme-example">
+
+    <div class="search-form-item col-md-3">
+        <a href="javascript:void(0)" onclick="refreshBannerTab()" class="easyui-linkbutton primary">查询</a>
+        <a href="javascript:void(0)" onclick="addBanner()" class="easyui-linkbutton primary">添加banner</a>
+    </div>
+</div>
+
+<div class="clear"></div>
+<div class="super-theme-example">
+    <div style="height: 400px;">
+        <table id="bannerTab"></table>
+    </div>
+
+    <div id="bannerWin" style="display: none;padding-top:30px;padding-left:100px;" title="新增banner">
+        <form id="bannerForm" method="post">
+            <input name="id" type="hidden" />
+            <div class="form-item col-md-10">
+                <label class="label-top">标题：</label>
+                <input id="banner_bannerTitle" class="easyui-validatebox easyui-textbox" prompt="请输入标题" name="bannerTitle" data-options="required:true, missingMessage:'请输入标题'">
+            </div>
+            <div class="form-item col-md-10">
+                <label class="label-top">图片：</label>
+                <input id="banner_bannerImg" class="easyui-validatebox easyui-textbox" prompt="请输入图片" name="bannerImg" data-options="required:true, missingMessage:'请输入图片'">
+            </div>
+            <div class="form-item col-md-10">
+                <label class="label-top">链接：</label>
+                <input id="banner_bannerUrl" class="easyui-validatebox easyui-textbox" prompt="请输入链接" name="bannerUrl" data-options="required:true, missingMessage:'请输入链接'">
+            </div>
+            <div class="form-item col-md-10">
+                <label class="label-top">排序：</label>
+                <input id="banner_sort" class="easyui-validatebox easyui-textbox" prompt="请输入排序" name="sort" data-options="required:true, missingMessage:'请输入排序'">
+            </div>
+            <div class="form-item col-md-10">
+                <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="saveBannerInfo()">保存</a>
+                <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="cancelBannerInfo()">取消</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    ;(function ($, window, document, undefined){
+        $('#bannerTab').datagrid({
+            url: App.href + '/api/common/banner/list',
+            fit: true,
+            pagination: true,
+            fitColumns: true,
+            method: 'GET',
+            pageSize: 10,
+            pageList: [10, 25, 50, 100, 200],
+            height: 400,
+            queryParams: {},
+            toolbar: [],
+            loadFilter: function(data) {
+                if (data.code === 401) {
+                    App.showMsg('token失效,请登录!');
+                    window.location.href = App.href + '/login.html';
+                    return {"total":0, "rows": "[]"};
+                } else {
+                    return data;
+                }
+            },
+            onBeforeLoad: function (param) {
+            },
+            columns: [
+                [{
+                    field: 'id',
+                    title: '序号',
+                    sortable: true,
+                    width: 50
+                }, {
+                    field: 'bannerTitle',
+                    title: '标题',
+                    width: 50
+                }, {
+                    field: 'bannerUrl',
+                    title: '链接',
+                    width: 50
+                }, {
+                    field: 'bannerImg',
+                    title: '图片',
+                    width: 50
+                }, {
+                    field: 'sort',
+                    title: '排序',
+                    width: 50
+                }, {
+                    field: 'readCnt',
+                    title: '浏览次数',
+                    width: 50
+                }, {
+                    field: 'custom_col1',
+                    title: '操作',
+                    width: 50,
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var btns = new Array();
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="delBanner(' + row.id + ')">删除</a>');
+                        return btns.join('');
+                    }
+                }]
+            ]
+        });
+
+    })(jQuery, window, document);
+
+    function refreshBannerTab() {
+        $('#bannerTab').datagrid('reload');
+    }
+
+    /**
+     * 删除banner
+     *
+     * @param id
+     */
+    function delBanner(id) {
+
+    }
+
+    /**
+     * 新增banner
+     */
+    function addBanner() {
+        $("#bannerWin").window({
+            width: "80%",
+            height: "80%",
+            modal:true
+        });
+    }
+
+    /**
+     * 保存banner
+     */
+    function saveBannerInfo() {
+
+    }
+
+    /**
+     * 取消新增banner
+     */
+    function cancelBannerInfo() {
+
+    }
+
+</script>
+</body>
+</html>

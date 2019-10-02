@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>圈子管理</title>
+</head>
+<body>
+
+<div class="super-theme-example">
+    <div class="search-form-item col-md-4">
+        <label class="label-top">圈子名称：</label>
+        <input name="circleName" class="easyui-validatebox easyui-textbox" prompt="请输入圈子名称">
+    </div>
+
+    <div class="search-form-item col-md-4">
+        <label class="label-top">圈主账户：</label>
+        <input name="userId" class="easyui-validatebox easyui-textbox" prompt="请输入圈主账户">
+    </div>
+
+    <div class="search-form-item col-md-4">
+        <label class="label-top">审核状态：</label>
+        <input name="reviewStatus" class="easyui-validatebox easyui-textbox" prompt="请输入审核状态">
+    </div>
+
+    <div class="search-form-item col-md-3">
+        <a href="javascript:void(0)" onclick="refreshCircleTab()" class="easyui-linkbutton primary">查询</a>
+    </div>
+</div>
+
+
+<div class="clear"></div>
+<div class="super-theme-example">
+    <div style="height: 400px;">
+        <table id="circleTab"></table>
+    </div>
+
+    <div id="circleDetailListWin" style="display: none;padding-top:30px;padding-left:100px;" title="圈子管理">
+        <div class="search-form-item col-md-4">
+            <label class="label-top">圈子名称：</label>
+            <label class="label-top circleDetailList_circleName"></label>
+        </div>
+
+        <div class="search-form-item col-md-4">
+            <label class="label-top">圈主账户：</label>
+            <label class="label-top circleDetailList_userId"></label>
+        </div>
+
+        <div class="search-form-item col-md-4">
+            <label class="label-top">关联企业：</label>
+            <input name="circleDetailList_companyId" class="easyui-validatebox easyui-textbox" prompt="请输入关联企业">
+        </div>
+
+        <div class="search-form-item col-md-3">
+            <a href="javascript:void(0);" onclick="refreshCircleDetailListTab()" class="easyui-linkbutton primary">查询</a>
+        </div>
+
+        <div class="clear"></div>
+
+        <table id="circleDetailListTab"></table>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+    ;(function ($, window, document, undefined){
+        $('#circleTab').datagrid({
+            url: App.href + '/api/circle/circle/list',
+            fit: true,
+            pagination: true,
+            fitColumns: true,
+            method: 'GET',
+            pageSize: 10,
+            pageList: [10, 25, 50, 100, 200],
+            height: 400,
+            queryParams: {},
+            toolbar: [],
+            loadFilter: function(data) {
+                if (data.code === 401) {
+                    App.showMsg('token失效,请登录!');
+                    window.location.href = App.href + '/login.html';
+                    return {"total":0, "rows": "[]"};
+                } else {
+                    return data;
+                }
+            },
+            onBeforeLoad: function (param) {
+                var circleName = $("input[name=circleName]").val();
+                var userId = $("input[name=userId]").val();
+                var reviewStatus = $("input[name=reviewStatus]").val();
+
+                param.circleName = circleName;
+                param.userId = userId;
+                param.reviewStatus = reviewStatus;
+            },
+            columns: [
+                [{
+                    field: 'id',
+                    title: '序号',
+                    sortable: true,
+                    width: 50
+                }, {
+                    field: 'circleName',
+                    title: '圈子名称',
+                    width: 50
+                }, {
+                    field: 'userName',
+                    title: '圈主',
+                    width: 50
+                }, {
+                    field: 'applicationTime',
+                    title: '申请时间',
+                    width: 50
+                }, {
+                    field: 'reviewStatus',
+                    title: '审核状态',
+                    width: 50,
+                    formatter: function(value, row, index) {
+                        var reviewStatusStr = "未审核";
+                        if(row.reviewStatus == 1) {
+                            reviewStatusStr = "已审核";
+                        }
+                        return reviewStatusStr;
+                    }
+                }, {
+                    field: 'status',
+                    title: '审核结果',
+                    width: 50,
+                    formatter: function(value, row, index) {
+                        var statusStr = "默认";
+                        if(row.status == 1) {
+                            statusStr = "通过";
+                        } else if(row.status == 2) {
+                            statusStr = "驳回";
+                        }
+                        return statusStr;
+                    }
+                }, {
+                    field: 'rejectReason',
+                    title: '审批理由',
+                    width: 50
+                }, {
+                    field: 'custom_col1',
+                    title: '操作',
+                    width: 50,
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var btns = new Array();
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="reviewCircle(' + row.id + ', 1)">通过</a>&nbsp;');
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="reviewCircle(' + row.id + ', 2)">不通过</a>&nbsp;');
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showCircle(' + row.id + ')">查看</a>');
+                        return btns.join('');
+                    }
+                }]
+            ]
+        });
+
+    })(jQuery, window, document);
+
+    function refreshCircleTab() {
+        $('#circleTab').datagrid('reload');
+    }
+
+    /**
+     * 审核圈子
+     *
+     * @param id
+     * @param status
+     */
+    function reviewCircle(id, status) {
+
+    }
+
+    /**
+     * 查看圈子关联企业列表
+     *
+     * @param id
+     */
+    function showCircle(id) {
+        $("#circleDetailListWin").window({
+            width: "80%",
+            height: "80%",
+            modal:true
+        });
+
+        $('#circleDetailListTab').datagrid({
+            url: App.href + '/api/circle/companyCircle/list',
+            fit: true,
+            pagination: true,
+            fitColumns: true,
+            method: 'GET',
+            pageSize: 10,
+            pageList: [10, 25, 50, 100, 200],
+            height: 400,
+            queryParams: {},
+            toolbar: [],
+            loadFilter: function(data) {
+                if (data.code === 401) {
+                    App.showMsg('token失效,请登录!');
+                    window.location.href = App.href + '/login.html';
+                    return {"total":0, "rows": "[]"};
+                } else {
+                    return data;
+                }
+            },
+            onBeforeLoad: function (param) {
+                var companyId = $("input[name=circleDetailList_companyId]").val();
+
+                param.companyId = companyId;
+            },
+            columns: [
+                [{
+                    field: 'id',
+                    title: '序号',
+                    sortable: true,
+                    width: 50
+                }, {
+                    field: 'companyName',
+                    title: '关联企业',
+                    width: 50
+                }, {
+                    field: 'circleName',
+                    title: '圈子名称',
+                    width: 50
+                }, {
+                    field: 'userName',
+                    title: '圈主',
+                    width: 50
+                }, {
+                    field: 'memberCnt',
+                    title: '圈子人数',
+                    width: 50
+                }, {
+                    field: 'circleDesc',
+                    title: '圈子说明',
+                    width: 50
+                }, {
+                    field: 'ctime',
+                    title: '成立时间',
+                    width: 50
+                }, {
+                    field: 'reason',
+                    title: '备注',
+                    width: 50
+                }, {
+                    field: 'custom_col1',
+                    title: '操作',
+                    width: 50,
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var btns = new Array();
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="disableCompanyCircle(' + row.id + ')">禁用</a>');
+                        return btns.join('');
+                    }
+                }]
+            ]
+        });
+    }
+
+    /**
+     * 圈子管理详情列表
+     */
+    function refreshCircleDetailListTab() {
+
+    }
+
+    /**
+     * 企业酷玩圈关联禁用
+     * @param id
+     */
+    function disableCompanyCircle(id) {
+
+    }
+
+</script>
+
+</body>
+</html>
