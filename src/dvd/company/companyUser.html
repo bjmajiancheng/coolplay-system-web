@@ -8,7 +8,8 @@
 <div class="super-theme-example companyLogSearch">
     <div class="search-form-item col-md-4">
         <label class="label-top">企业名称：</label>
-        <input name="companyName" class="easyui-validatebox easyui-textbox" prompt="请输入企业名称">
+        <!--<input name="companyName" class="easyui-validatebox easyui-textbox" prompt="请输入企业名称">-->
+        <input id="companyUser_companyName" name="companyId" class="easyui-combobox">
     </div>
 
     <div class="search-form-item col-md-4">
@@ -18,12 +19,12 @@
 
     <div class="search-form-item col-md-4">
         <label class="label-top">绑定电话：</label>
-        <input name="contactMobile" class="easyui-validatebox easyui-textbox" prompt="请输入绑定电话">
+        <input name="contactPhone" class="easyui-validatebox easyui-textbox" prompt="请输入绑定电话">
     </div>
 
 
     <div class="search-form-item col-md-3">
-        <a href="javascript:void(0)" onclick="refreshCompanyLog()" class="easyui-linkbutton primary">查询</a>
+        <a href="javascript:void(0)" onclick="refreshCompanyUser()" class="easyui-linkbutton primary">查询</a>
     </div>
 </div>
 
@@ -34,15 +35,76 @@
         <table id="companyUserTab"></table>
     </div>
 
-    <div id="companyLoginLogWin" style="display: none;padding-top:30px;padding-left:100px;" title="登录日志">
-        <table id="companyLoginLogTab"></table>
+    <div id="companyUserLogWin" style="display: none;padding:10px;" title="登录日志">
+        <table id="companyUserLogTab"></table>
     </div>
+
+    <div id="companyUserDetailWin" style="display: none;padding:10px;" title="用户详情">
+        <div class="form-item col-md-10">
+            <label class="label-top">账户：</label>
+            <label class="label-top userNameLabel"></label>
+        </div>
+        <div class="form-item col-md-10">
+            <label class="label-top">所属部门：</label>
+            <label class="label-top deptNameLabel"></label>
+        </div>
+        <div class="form-item col-md-10">
+            <label class="label-top">角色：</label>
+            <label class="label-top userRoleLabel"></label>
+        </div>
+        <div class="form-item col-md-10">
+            <label class="label-top">联系电话：</label>
+            <label class="label-top companyUser_contactPhoneLabel"></label>
+        </div>
+        <div class="form-item col-md-10">
+            <label class="label-top">账号状态：</label>
+            <label class="label-top userEnableLabel"></label>
+        </div>
+
+        <div class="form-item col-md-10">
+            <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="closeUserDetail();">关闭</a>
+        </div>
+    </div>
+
+    <!--<div id="companyUserEditWin" style="display: none;padding:10px;" title="用户修改">
+        <form id="companyUserEditForm">
+            <div class="form-item col-md-10">
+                <label class="label-top">账户：</label>
+                <label class="label-top userNameLabel"></label>
+            </div>
+            <div class="form-item col-md-10">
+                <label class="label-top">所属部门：</label>
+                <label class="label-top deptNameLabel"></label>
+            </div>
+            <div class="form-item col-md-10">
+                <label class="label-top">角色：</label>
+                <label class="label-top userRoleLabel"></label>
+            </div>
+            <div class="form-item col-md-10">
+                <label class="label-top">联系电话：</label>
+                <input id="companyUser_contactPhone" name="contactPhone" class="easyui-validatebox easyui-textbox" prompt="请输入联系电话" data-options="required:true, missingMessage:'请输入联系电话'">
+            </div>
+            <div class="form-item col-md-10">
+                <label class="label-top">账号状态：</label>
+                <label class="label-top userEnableLabel"></label>
+                <select id="companyUser_enabled" class="easyui-combobox" data-options="editable:false,panelHeight:null" name="enabled">
+                    <option value="1" selected>启用</option>
+                    <option value="0">禁用</option>
+                </select>
+            </div>
+
+            <div class="form-item col-md-10">
+                <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="updateCompanyUser();">保存</a>
+                <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="closeCompanyUserEditWin();">关闭</a>
+            </div>
+        </form>
+    </div>-->
 </div>
 
 <script type="text/javascript">
     ;(function ($, window, document, undefined){
         $('#companyUserTab').datagrid({
-            url: App.href + '/api/company/companyLog/list',
+            url: App.href + '/api/company/companyUser/list',
             fit: true,
             pagination: true,
             fitColumns: true,
@@ -65,26 +127,44 @@
                 var companyName = $(".companyLogSearch").find("input[name=companyName]").val();
                 var userName = $(".companyLogSearch").find("input[name=userName]").val();
                 var contactMobile = $(".companyLogSearch").find("input[name=contactMobile]").val();
+                var companyId = $(".companyLogSearch").find("input[name=companyId]").val();
 
 
                 param.companyName = companyName;
                 param.userName = userName;
                 param.contactMobile = contactMobile;
+                param.companyId = companyId;
             },
             columns: [
                 [{
                     field: 'id',
+                    title: '用户编号',
+                    sortable: true,
+                    width: 50
+                },{
+                    field: 'userName',
                     title: '企业用户账号',
                     sortable: true,
                     width: 50
                 }, {
-                    field: 'roleName',
+                    field: 'companyName',
                     title: '企业名称',
                     width: 50
                 }, {
-                    field: 'ctime',
+                    field: 'contactPhone',
                     title: '绑定电话',
                     width: 50
+                }, {
+                    field: 'enabled',
+                    title: '状态',
+                    width: 50,
+                    formatter: function(value, row, index) {
+                        var enabledStr = "禁用";
+                        if(row.enabled == 1) {
+                            enabledStr = "正常";
+                        }
+                        return enabledStr;
+                    }
                 }, {
                     field: 'custom_col1',
                     title: '登录日志',
@@ -92,7 +172,7 @@
                     align: 'center',
                     formatter: function(value, row, index) {
                         var btns = new Array();
-                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="">登录日志</a>');
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showCompanyUserLog('+ row.id +')">登录日志</a>');
                         return btns.join('');
                     }
                 }, {
@@ -102,22 +182,25 @@
                     align: 'center',
                     formatter: function(value, row, index) {
                         var btns = new Array();
-                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="enabledUser()">启用</a>&nbsp;');
-                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="disableUser()">禁用</a>&nbsp;');
-                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showUser()">查看</a>&nbsp;');
-                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="delUser()">删除</a>&nbsp;');
-                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="editUser()">修改</a>');
+                        if(row.enabled == 0) {
+                            btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="enabledUser('+ row.id +')">启用</a>&nbsp;');
+                        } else if(row.enabled == 1) {
+                            btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="disableUser('+ row.id +')">禁用</a>&nbsp;');
+                        }
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showUser('+ row.id +')">查看</a>&nbsp;');
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="delUser('+ row.id +')">删除</a>&nbsp;');
+                        /*btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="editUser('+ row.id +')">修改</a>');*/
                         return btns.join('');
                     }
                 }]
             ]
         });
 
-
+        initCompanyBaseInfo();
 
     })(jQuery, window, document);
 
-    function refreshCompanyLog() {
+    function refreshCompanyUser() {
         $('#companyUserTab').datagrid('reload');
     }
 
@@ -125,15 +208,15 @@
      * 查看登录日志
      * @param companyId
      */
-    function showLoginLog(companyId) {
-        $("#companyLoginLogWin").window({
+    function showCompanyUserLog(userId) {
+        $("#companyUserLogWin").window({
             width: "80%",
             height: "80%",
             modal:true
         });
 
-        $('#companyLoginLogTab').datagrid({
-            url: App.href + '/api/company/companyLog/loginLogList',
+        $('#companyUserLogTab').datagrid({
+            url: App.href + '/api/company/companyLog/list',
             fit: true,
             pagination: true,
             fitColumns: true,
@@ -153,7 +236,7 @@
                 }
             },
             onBeforeLoad: function (param) {
-                param.companyId = companyId;
+                param.userId = userId;
             },
             columns: [
                 [{
@@ -177,22 +260,34 @@
     /**
      * 关闭登录日志窗口
      */
-    function closeLoginLog() {
-        $('#companyLoginLogWin').window('close');
+    function closeLog() {
+        $('#companyLogWin').window('close');
     }
 
     /**
      * 启用用户
      */
     function enabledUser(userId) {
+        App.confirm('您确认想要启用用户吗？', function() {
+            App.getRequestData('/api/company/companyUser/updateUserEnable', {userId: userId, enable: 1}, function(data) {
+                App.showMsg("启用用户成功");
+                refreshCompanyUser();
+            });
 
+        });
     }
 
     /**
      * 禁用用户
      */
     function disableUser(userId) {
+        App.confirm('您确认想要禁用用户吗？', function() {
+            App.getRequestData('/api/company/companyUser/updateUserEnable', {userId: userId, enable: 0}, function(data) {
+                App.showMsg("禁用用户成功");
+                refreshCompanyUser();
+            });
 
+        });
     }
 
     /**
@@ -200,20 +295,102 @@
      */
     function showUser(userId) {
 
+        $('#companyUserDetailWin').window({
+            width:600,
+            height:400,
+            modal:true
+        });
+
+        App.getRequestData('/api/company/companyUser/getCompanyUser', {'userId': userId}, function(data) {
+
+            $(".userNameLabel").text(data.userName);
+            $(".deptNameLabel").text(data.deptName);
+            $(".userRoleLabel").text(data.roleName);
+            $(".companyUser_contactPhoneLabel").text(data.contactPhone);
+
+            var enabledStr = "禁用";
+            if(data.enabled == 1) {
+                enabledStr = "正常";
+            }
+
+            $(".userEnableLabel").text(enabledStr);
+        });
+    }
+
+    function closeUserDetail() {
+        $('#companyUserDetailWin').window('close');
     }
 
     /**
      * 删除用户
      */
     function delUser(userId) {
-
+        App.confirm('您确认想要删除用户吗？', function() {
+            App.getRequestData('/api/company/companyUser/delUser', {userId: userId}, function(data) {
+                App.showMsg("删除用户成功");
+                refreshCompanyUser();
+            });
+        });
     }
 
     /**
      * 修改用户
      */
-    function editUser(userId) {
+    /*function editUser(userId) {
+        $("#companyUserEditWin").window({
+            width:600,
+            height:400,
+            modal:true
+        });
 
+        App.getRequestData('/api/company/companyUser/getCompanyUser', {'userId': userId}, function(data) {
+
+            $("#companyUserEditForm").find(".userNameLabel").text(data.userName);
+            $("#companyUserEditForm").find(".deptNameLabel").text(data.deptName);
+            $("#companyUserEditForm").find(".userRoleLabel").text(data.roleName);
+            $("#companyUser_contactPhone").textbox('setValue', data.contactPhone);
+            $("#companyUser_enabled").combobox('setValue', data.enabled);
+
+        });
+    }*/
+
+    /**
+     * 关闭修改公司用户窗口
+     */
+    /*function closeCompanyUserEditWin() {
+        $('#companyUserEditWin').window('close');
+    }*/
+
+    /**
+     * 更新公司用户信息
+     */
+    /*function updateCompanyUser() {
+        var roleId = $('#systemUserWin').find('input[name=roleId]').val();
+
+        if(roleId == 0) {
+            App.showMsg('请选择角色');
+            return false;
+        }
+    }*/
+
+    /**
+     * 初始化用户基础信息
+     *
+     */
+    function initCompanyBaseInfo() {
+        // 获取公司角色信息
+        App.getRequestData("/api/system/company/companyOptions", {}, function(data) {
+            data.rows.unshift({id:'', companyName:'请选择'});
+            $("#companyUser_companyName").combobox({
+                valueField: 'id',
+                textField: 'companyName',
+                editable: false,
+                required: true,
+                mode: 'local',
+                value: '',
+                data: data.rows
+            });
+        });
     }
 </script>
 </body>

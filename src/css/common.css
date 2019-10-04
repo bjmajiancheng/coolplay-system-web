@@ -43,3 +43,34 @@
 .align_right {
     text-align: center
 }
+
+.post-detail .user>span{
+    display: inline-block;
+    height:100%;
+    float: left;
+}
+.post-detail .user-icon{
+    position: relative;
+    margin-right: 10px;
+    width: 40px;
+}
+.post-detail .user-icon>img{
+    position: absolute;
+    top: 50%;
+    margin-top: 30px;
+    left: 50px;
+}
+
+.post-detail img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+}
+
+.post-detail .user {
+    width: 100px;
+}
+
+.post-detail li {
+    list-style-type:none
+}

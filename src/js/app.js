@@ -260,6 +260,19 @@
         });
     };
 
+    /**
+     * 确认窗口展示文本
+     *
+     * @param confirmText
+     */
+    App.confirm = function(confirmText, callback) {
+        $.messager.confirm('确认', confirmText, function(r) {
+            if(r) {
+                callback();
+            }
+        });
+    }
+
     App.$content = function () {
         return $("#main-body");
     };

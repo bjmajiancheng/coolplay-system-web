@@ -13,12 +13,12 @@
 
     <div class="search-form-item col-md-4">
         <label class="label-top">发布用户：</label>
-        <input name="userName" class="easyui-validatebox easyui-textbox" prompt="请输入发布用户">
+        <input name="publicUserName" class="easyui-validatebox easyui-textbox" prompt="请输入发布用户">
     </div>
 
     <div class="search-form-item col-md-4">
         <label class="label-top">标签：</label>
-        <input name="labelName" class="easyui-validatebox easyui-textbox" prompt="请输入标签">
+        <input id="post_labelId" name="labelId" class="easyui-combobox">
     </div>
 
     <div class="search-form-item col-md-4">
@@ -43,7 +43,7 @@
         <table id="postTab"></table>
     </div>
 
-    <div id="postCommentWin" style="display: none;padding-top:30px;padding-left:100px;" title="评论列表">
+    <div id="postCommentWin" style="display: none; padding:5px;" title="评论列表">
         <div class="super-theme-example">
             <div class="search-form-item col-md-4">
                 <label class="label-top">帖子标题：</label>
@@ -69,27 +69,29 @@
         <table id="postCommentTab"></table>
     </div>
 
-    <div id="postDetailWin" style="display: none;padding-top:30px;padding-left:100px;" title="帖子详情">
-        <div class="easyui-layout" style="width:100%;height:400px;">
-            <div data-options="region:'west',title:'',split:true" style="width:100px;">
+    <div id="postDetailWin" style="display: none;padding:5px;" title="帖子详情">
+        <div class="easyui-layout post-detail" style="width:100%;height:400px;">
+            <div data-options="region:'west',title:'',split:true" style="width:250px;">
                 <div class="search-form-item col-md-4">
                     <li class="user">
                         <span class="user-icon"><img src="../../cdn/img/favicon.png"/></span>
-                        <span>Windr</span>
+                        <span></span>
                     </li>
                 </div>
 
-                <div class="search-form-item col-md-4">
-                    <label class="label-top">标题：</label>
-                    <label class="label-top postTitleLabel"></label>
+                <div class="clear" style="margin-top:200px;"></div>
+
+                <div class="form-item col-md-12">
+                    <label class="label-top" style="min-width: 50px;">标题：</label>
+                    <label class="label-top postTitleLabel" style="min-width: 50px;"></label>
                 </div>
-                <div class="search-form-item col-md-4">
-                    <label class="label-top">日期：</label>
-                    <label class="label-top ctimeLabel"></label>
+                <div class="form-item col-md-12">
+                    <label class="label-top" style="min-width: 50px;">日期：</label>
+                    <label class="label-top ctimeLabel" style="min-width: 50px;"></label>
                 </div>
-                <div class="search-form-item col-md-4">
-                    <label class="label-top">用户名：</label>
-                    <label class="label-top userNameLabel"></label>
+                <div class="form-item col-md-12">
+                    <label class="label-top" style="min-width: 50px;">用户名：</label>
+                    <label class="label-top userNameLabel" style="min-width: 50px;"></label>
                 </div>
             </div>
             <div data-options="region:'center',title:''" style="padding:5px;">
@@ -99,7 +101,7 @@
             </div>
         </div>
 
-        <div class="form-item col-md-10">
+        <div class="form-item col-md-10 align_center">
             <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="closePostDetailWin()">关闭</a>
         </div>
     </div>
@@ -108,7 +110,7 @@
 <script type="text/javascript">
     ;(function ($, window, document, undefined){
         $('#postTab').datagrid({
-            url: App.href + '/api/post/post/list',
+            url: App.href + '/api/community/post/list',
             fit: true,
             pagination: true,
             fitColumns: true,
@@ -129,12 +131,12 @@
             },
             onBeforeLoad: function (param) {
                 var postTitle = $("input[name=postTitle]").val();
-                var userName = $("input[name=userName]").val();
+                var publicUserName = $("input[name=publicUserName]").val();
                 var labelName = $("input[name=labelName]").val();
                 var isTop = $("input[name=isTop]").val();
 
                 param.postTitle = postTitle;
-                param.userName = userName;
+                param.publicUserName = publicUserName;
                 param.labelName = labelName;
                 param.isTop = isTop;
             },
@@ -143,7 +145,7 @@
                     field: 'id',
                     title: '编号',
                     sortable: true,
-                    width: 50
+                    width: 20
                 }, {
                     field: 'postTitle',
                     title: '标题',
@@ -151,7 +153,7 @@
                 }, {
                     field: 'isTop',
                     title: '置顶',
-                    width: 50,
+                    width: 20,
                     formatter: function(value, row, index) {
                         var isTopStr = "否";
                         if(row.isTop == 1) {
@@ -161,7 +163,7 @@
                         return isTopStr;
                     }
                 }, {
-                    field: 'userName',
+                    field: 'publicUserName',
                     title: '发布用户',
                     width: 50
                 }, {
@@ -184,12 +186,12 @@
                         html.push(row.commentCnt);
                         html.push('<br />');
 
-                        return html;
+                        return html.join('');
                     }
                 }, {
                     field: 'custom_col2',
                     title: '操作',
-                    width: 50,
+                    width: 100,
                     align: 'center',
                     formatter: function(value, row, index) {
                         var btns = new Array();
@@ -208,6 +210,9 @@
                 }]
             ]
         });
+
+        //初始化帖子基础信息
+        initPostBaseInfo();
     })(jQuery, window, document);
 
 
@@ -230,8 +235,19 @@
      * @param postId
      */
     function showPostCommentList(postId) {
+        $('#postCommentWin').window({
+            width:'80%',
+            height:'80%',
+            modal:true
+        });
+
+        App.getRequestData('/api/community/post/showPost', {id: postId}, function(data) {
+            $("#postCommentWin").find(".postComment_PostTitleLabel").text(data.postTitle);
+            $("#postCommentWin").find(".postComment_userNameLabel").text(data.publicUserName);
+        });
+
         $('#postCommentTab').datagrid({
-            url: App.href + '/api/post/postComment/list',
+            url: App.href + '/api/community/postComment/list',
             fit: true,
             pagination: true,
             fitColumns: true,
@@ -263,15 +279,15 @@
                     sortable: true,
                     width: 50
                 }, {
-                    field: 'postTitle',
+                    field: 'commentContent',
                     title: '评论内容',
                     width: 50
                 }, {
-                    field: 'isTop',
+                    field: 'commentUserName',
                     title: '评论用户',
                     width: 50
                 }, {
-                    field: 'userName',
+                    field: 'ctime',
                     title: '评论时间',
                     width: 50
                 }, {
@@ -293,8 +309,18 @@
      * 查看帖子
      */
     function showPost(id) {
-        App.getRequestData('/api/post/post/showPost', {id: id}, function(data) {
+        $('#postDetailWin').window({
+            width:'80%',
+            height:'80%',
+            modal:true
+        });
 
+        App.getRequestData('/api/community/post/showPost', {id: id}, function(data) {
+            $("#postDetailWin").find(".postTitleLabel").text(data.postTitle);
+            $("#postDetailWin").find(".ctimeLabel").text(data.ctime);
+            $("#postDetailWin").find(".userNameLabel").text(data.publicUserName);
+
+            $("#postDetailWin").find(".postDetail_postContent").html(data.postContent);
         });
     }
 
@@ -302,8 +328,10 @@
      * 取消置顶帖子
      */
     function canalTopPost(id) {
-        App.getRequestData('/api/post/post/canalTopPost', {id: id}, function(data) {
+        App.getRequestData('/api/community/post/updateIsTop', {id: id, isTop: 0}, function(data) {
+            App.showMsg("取消置顶帖子成功");
 
+            refreshPost();
         });
     }
 
@@ -311,8 +339,10 @@
      * 置顶帖子
      */
     function topPost(id) {
-        App.getRequestData('/api/post/post/topPost', {id: id}, function(data) {
+        App.getRequestData('/api/community/post/updateIsTop', {id: id, isTop: 1}, function(data) {
+            App.showMsg("置顶帖子成功");
 
+            refreshPost();
         });
     }
 
@@ -320,8 +350,10 @@
      * 删除帖子
      */
     function delPost(id) {
-        App.getRequestData('/api/post/post/delPost', {id: id}, function(data) {
+        App.getRequestData('/api/community/post/delPost', {id: id}, function(data) {
+            App.showMsg("删除帖子成功");
 
+            refreshPost();
         });
     }
 
@@ -330,8 +362,10 @@
      * @param id
      */
     function delComment(id) {
-        App.getRequestData('/api/post/postComment/delComment', {id: id}, function(data) {
+        App.getRequestData('/api/community/postComment/delComment', {id: id}, function(data) {
+            App.showMsg("删除评论成功");
 
+            refreshPostComment();
         });
     }
 
@@ -340,6 +374,26 @@
      */
     function closePostDetailWin() {
         $('#postDetailWin').window('close');
+    }
+
+    /**
+     * 初始化帖子基础信息
+     *
+     */
+    function initPostBaseInfo() {
+        // 获取公司角色信息
+        App.getRequestData("/api/common/label/options", {}, function(data) {
+            data.rows.unshift({id:'', labelName:'请选择'});
+            $("#post_labelId").combobox({
+                valueField: 'id',
+                textField: 'labelName',
+                editable: false,
+                required: true,
+                mode: 'local',
+                value: '',
+                data: data.rows
+            });
+        });
     }
 
 </script>
