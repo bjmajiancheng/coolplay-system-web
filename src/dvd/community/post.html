@@ -382,7 +382,7 @@
      */
     function initPostBaseInfo() {
         // 获取公司角色信息
-        App.getRequestData("/api/common/label/options", {}, function(data) {
+        App.getRequestData("/api/community/label/options", {}, function(data) {
             data.rows.unshift({id:'', labelName:'请选择'});
             $("#post_labelId").combobox({
                 valueField: 'id',

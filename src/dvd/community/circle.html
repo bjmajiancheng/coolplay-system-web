@@ -14,12 +14,16 @@
 
     <div class="search-form-item col-md-4">
         <label class="label-top">圈主账户：</label>
-        <input name="userId" class="easyui-validatebox easyui-textbox" prompt="请输入圈主账户">
+        <input name="userName" class="easyui-validatebox easyui-textbox" prompt="请输入圈主账户">
     </div>
 
     <div class="search-form-item col-md-4">
         <label class="label-top">审核状态：</label>
-        <input name="reviewStatus" class="easyui-validatebox easyui-textbox" prompt="请输入审核状态">
+        <select class="easyui-combobox" data-options="editable:false,panelHeight:null" name="reviewStatus">
+            <option value="">请选择</option>
+            <option value="0">未审核</option>
+            <option value="1">已审核</option>
+        </select>
     </div>
 
     <div class="search-form-item col-md-3">
@@ -34,7 +38,7 @@
         <table id="circleTab"></table>
     </div>
 
-    <div id="circleDetailListWin" style="display: none;padding-top:30px;padding-left:100px;" title="圈子管理">
+    <div id="circleDetailListWin" style="display: none;padding:5px;" title="圈子管理">
         <div class="search-form-item col-md-4">
             <label class="label-top">圈子名称：</label>
             <label class="label-top circleDetailList_circleName"></label>
@@ -42,12 +46,15 @@
 
         <div class="search-form-item col-md-4">
             <label class="label-top">圈主账户：</label>
-            <label class="label-top circleDetailList_userId"></label>
+            <label class="label-top circleDetailList_userName"></label>
         </div>
 
         <div class="search-form-item col-md-4">
             <label class="label-top">关联企业：</label>
-            <input name="circleDetailList_companyId" class="easyui-validatebox easyui-textbox" prompt="请输入关联企业">
+
+            <select class="easyui-combobox" data-options="editable:false,panelHeight:null" name="circleDetailList_companyId" id="circleDetailList_companyId">
+
+            </select>
         </div>
 
         <div class="search-form-item col-md-3">
@@ -65,7 +72,7 @@
 <script type="text/javascript">
     ;(function ($, window, document, undefined){
         $('#circleTab').datagrid({
-            url: App.href + '/api/circle/circle/list',
+            url: App.href + '/api/community/circle/list',
             fit: true,
             pagination: true,
             fitColumns: true,
@@ -86,11 +93,11 @@
             },
             onBeforeLoad: function (param) {
                 var circleName = $("input[name=circleName]").val();
-                var userId = $("input[name=userId]").val();
+                var userName = $("input[name=userName]").val();
                 var reviewStatus = $("input[name=reviewStatus]").val();
 
                 param.circleName = circleName;
-                param.userId = userId;
+                param.userName = userName;
                 param.reviewStatus = reviewStatus;
             },
             columns: [
@@ -98,7 +105,7 @@
                     field: 'id',
                     title: '序号',
                     sortable: true,
-                    width: 50
+                    width: 20
                 }, {
                     field: 'circleName',
                     title: '圈子名称',
@@ -114,7 +121,7 @@
                 }, {
                     field: 'reviewStatus',
                     title: '审核状态',
-                    width: 50,
+                    width: 30,
                     formatter: function(value, row, index) {
                         var reviewStatusStr = "未审核";
                         if(row.reviewStatus == 1) {
@@ -125,9 +132,9 @@
                 }, {
                     field: 'status',
                     title: '审核结果',
-                    width: 50,
+                    width: 30,
                     formatter: function(value, row, index) {
-                        var statusStr = "默认";
+                        var statusStr = "未审核";
                         if(row.status == 1) {
                             statusStr = "通过";
                         } else if(row.status == 2) {
@@ -148,7 +155,7 @@
                         var btns = new Array();
                         btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="reviewCircle(' + row.id + ', 1)">通过</a>&nbsp;');
                         btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="reviewCircle(' + row.id + ', 2)">不通过</a>&nbsp;');
-                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showCircle(' + row.id + ')">查看</a>');
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showCircleDetail(' + row.id + ')">查看</a>');
                         return btns.join('');
                     }
                 }]
@@ -168,7 +175,20 @@
      * @param status
      */
     function reviewCircle(id, status) {
-
+        var rejectReason = "";
+        if(status == 2) {
+            App.prompt('请输入不通过理由', function(data) {
+                App.getRequestData('/api/community/circle/reviewCircle', {id: id, status: status, rejectReason: data}, function(data) {
+                    App.showMsg("审核不通过操作成功.");
+                    refreshCircleTab();
+                });
+            });
+        } else if(status == 1) {
+            App.getRequestData('/api/community/circle/reviewCircle', {id: id, status: status, rejectReason:''}, function(data) {
+                App.showMsg("审核通过操作成功.");
+                refreshCircleTab();
+            });
+        }
     }
 
     /**
@@ -176,15 +196,22 @@
      *
      * @param id
      */
-    function showCircle(id) {
+    function showCircleDetail(id) {
         $("#circleDetailListWin").window({
             width: "80%",
             height: "80%",
             modal:true
         });
 
+        App.getRequestData('/api/community/circle/getCircle', {'id': id}, function(data){
+            $("#circleDetailListWin").find(".circleDetailList_circleName").text(data.circleName);
+            $("#circleDetailListWin").find(".circleDetailList_userName").text(data.userName);
+        });
+
+        initCompanyCircleBaseInfo();
+
         $('#circleDetailListTab').datagrid({
-            url: App.href + '/api/circle/companyCircle/list',
+            url: App.href + '/api/community/companyCircle/list',
             fit: true,
             pagination: true,
             fitColumns: true,
@@ -207,13 +234,14 @@
                 var companyId = $("input[name=circleDetailList_companyId]").val();
 
                 param.companyId = companyId;
+                param.circleId = id;
             },
             columns: [
                 [{
                     field: 'id',
                     title: '序号',
                     sortable: true,
-                    width: 50
+                    width: 20
                 }, {
                     field: 'companyName',
                     title: '关联企业',
@@ -235,11 +263,22 @@
                     title: '圈子说明',
                     width: 50
                 }, {
-                    field: 'ctime',
+                    field: 'circleCtime',
                     title: '成立时间',
                     width: 50
                 }, {
-                    field: 'reason',
+                    field: 'isDisable',
+                    title: '取消关联',
+                    width: 30,
+                    formatter: function(value, row, index) {
+                        var disableText = "否";
+                        if(row.isDisable == 1) {
+                            disableText = "是";
+                        }
+                        return disableText;
+                    }
+                }, {
+                    field: 'rejectReason',
                     title: '备注',
                     width: 50
                 }, {
@@ -249,7 +288,11 @@
                     align: 'center',
                     formatter: function(value, row, index) {
                         var btns = new Array();
-                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="disableCompanyCircle(' + row.id + ')">禁用</a>');
+                        if(row.isDisable == 0) {
+                            btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="disableCompanyCircle(' + row.id + ', 1)">禁用</a>');
+                        } else {
+                            btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="disableCompanyCircle(' + row.id + ', 0)">启用</a>');
+                        }
                         return btns.join('');
                     }
                 }]
@@ -261,15 +304,49 @@
      * 圈子管理详情列表
      */
     function refreshCircleDetailListTab() {
-
+        $("#circleDetailListTab").datagrid('reload');
     }
 
     /**
      * 企业酷玩圈关联禁用
      * @param id
      */
-    function disableCompanyCircle(id) {
+    function disableCompanyCircle(id, isDisable) {
+        if(isDisable == 0) {
+            App.getRequestData('/api/community/companyCircle/updateCompanyCircleDisable', {id: id, isDisable: isDisable, disableReason: ''}, function(data) {
+                App.showMsg("启用关系成功");
 
+                refreshCircleDetailListTab();
+            });
+        } else if(isDisable == 1) {
+            App.prompt('请输入禁用原因：', function(disableReason) {
+                App.getRequestData('/api/community/companyCircle/updateCompanyCircleDisable', {id: id, isDisable: isDisable, disableReason: disableReason}, function(data) {
+                    App.showMsg("禁用关系成功");
+
+                    refreshCircleDetailListTab();
+                });
+            });
+        }
+    }
+
+    /**
+     * 初始化用户基础信息
+     *
+     */
+    function initCompanyCircleBaseInfo() {
+        // 获取公司角色信息
+        App.getRequestData("/api/system/company/companyOptions", {}, function(data) {
+            data.rows.unshift({id:'', companyName:'请选择'});
+            $("#circleDetailList_companyId").combobox({
+                valueField: 'id',
+                textField: 'companyName',
+                editable: false,
+                required: true,
+                mode: 'local',
+                value: '',
+                data: data.rows
+            });
+        });
     }
 
 </script>

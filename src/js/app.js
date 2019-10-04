@@ -271,6 +271,20 @@
                 callback();
             }
         });
+    };
+
+    /**
+     * 确认窗口输入文本
+     *
+     * @param promptText
+     * @param callback
+     */
+    App.prompt = function(promptText, callback) {
+        $.messager.prompt('提示信息', promptText, function(r) {
+            if(r) {
+                callback(r);
+            }
+        });
     }
 
     App.$content = function () {

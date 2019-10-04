@@ -6,6 +6,10 @@
 </head>
 <body>
 <div class="super-theme-example">
+    <div class="search-form-item col-md-4">
+        <label class="label-top">标题：</label>
+        <input name="bannerTitle" class="easyui-validatebox easyui-textbox" prompt="请输入标题">
+    </div>
 
     <div class="search-form-item col-md-3">
         <a href="javascript:void(0)" onclick="refreshBannerTab()" class="easyui-linkbutton primary">查询</a>
@@ -21,14 +25,17 @@
 
     <div id="bannerWin" style="display: none;padding-top:30px;padding-left:100px;" title="新增banner">
         <form id="bannerForm" method="post">
-            <input name="id" type="hidden" />
+            <!--<input name="id" type="hidden" />-->
             <div class="form-item col-md-10">
                 <label class="label-top">标题：</label>
                 <input id="banner_bannerTitle" class="easyui-validatebox easyui-textbox" prompt="请输入标题" name="bannerTitle" data-options="required:true, missingMessage:'请输入标题'">
             </div>
             <div class="form-item col-md-10">
-                <label class="label-top">图片：</label>
-                <input id="banner_bannerImg" class="easyui-validatebox easyui-textbox" prompt="请输入图片" name="bannerImg" data-options="required:true, missingMessage:'请输入图片'">
+                <label class="label-top" style="float:left;">图片：</label>
+                <div id="bannerImgDiv" style="float:left;">
+
+                </div>
+                <!--<input id="banner_bannerImg" class="easyui-validatebox easyui-textbox" prompt="请输入图片" name="bannerImg" data-options="required:true, missingMessage:'请输入图片'">-->
             </div>
             <div class="form-item col-md-10">
                 <label class="label-top">链接：</label>
@@ -69,6 +76,9 @@
                 }
             },
             onBeforeLoad: function (param) {
+                var bannerTitle = $("input[name=bannerTitle]").val();
+
+                param.bannerTitle = bannerTitle;
             },
             columns: [
                 [{
@@ -87,7 +97,11 @@
                 }, {
                     field: 'bannerImg',
                     title: '图片',
-                    width: 50
+                    width: 50,
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        return '<img src="' + App.href + row.bannerImg +'" width="100px" height="100px"/>';
+                    }
                 }, {
                     field: 'sort',
                     title: '排序',
@@ -110,6 +124,24 @@
             ]
         });
 
+        $('#bannerForm').form({
+            url: App.href + '/api/common/banner/saveBanner',
+            method: 'POST',
+            onSubmit:function(){
+                return $(this).form('validate');
+            },
+            success:function(data){
+                var obj = JSON.parse(data);
+                if (obj.code == 200) {
+                    App.showMsg('保存成功');
+                    $('#bannerWin').window('close');
+                } else {
+                    App.showMsg(obj.message);
+                }
+                refreshBannerTab();
+            }
+        });
+
     })(jQuery, window, document);
 
     function refreshBannerTab() {
@@ -122,7 +154,10 @@
      * @param id
      */
     function delBanner(id) {
-
+        App.getRequestData('/api/common/banner/delBanner', {id: id}, function(data) {
+            App.showMsg("删除banner成功");
+            refreshBannerTab();
+        });
     }
 
     /**
@@ -134,20 +169,35 @@
             height: "80%",
             modal:true
         });
+
+        $('#bannerImgDiv').html('');
+
+        var bannerImgEle = App.uploadImage({id: "bannerImg", name: 'bannerImg', isAjaxUpload: true, autoUpload: true});
+        $('#bannerImgDiv').append(bannerImgEle);
+
+        $("#banner_bannerTitle").textbox('setValue', '');
+        $("#banner_bannerUrl").textbox('setValue', '');
+        $("#banner_sort").textbox('setValue', '');
     }
 
     /**
      * 保存banner
      */
     function saveBannerInfo() {
+        var bannerImg = $("input[name=bannerImg]").val();
+        if(bannerImg == undefined || bannerImg == '') {
+            App.showMsg("请上传图片信息");
+            return false;
+        }
 
+        $("#bannerForm").submit();
     }
 
     /**
      * 取消新增banner
      */
     function cancelBannerInfo() {
-
+        $("#bannerWin").window('close');
     }
 
 </script>

@@ -13,7 +13,11 @@
 
     <div class="search-form-item col-md-4">
         <label class="label-top">所属分类：</label>
-        <input name="catId" class="easyui-validatebox easyui-textbox" prompt="请输入所属分类">
+
+        <select class="easyui-combobox" data-options="editable:false,panelHeight:null" name="label_catId" id="labelList_catId">
+
+        </select>
+
     </div>
 
     <div class="search-form-item col-md-3">
@@ -33,17 +37,21 @@
             <input name="id" type="hidden" />
             <div class="form-item col-md-10">
                 <label class="label-top">标签名称：</label>
-                <input id="label_labelName" class="easyui-validatebox easyui-textbox" prompt="请输入标签名称" name="labelName" data-options="required:true, missingMessage:'请输入标签名称'">
+                <input id="labelDetail_labelName" class="easyui-validatebox easyui-textbox" prompt="请输入标签名称" name="labelName" data-options="required:true, missingMessage:'请输入标签名称'">
             </div>
 
             <div class="form-item col-md-10">
                 <label class="label-top">所属分类：</label>
-                <input id="label_catId" class="easyui-validatebox easyui-textbox" prompt="请输入所属分类" name="catId" data-options="required:true, missingMessage:'请输入所属分类'">
+                <select id="labelDetail_catId" class="easyui-combobox" data-options="editable:false,panelHeight:null" name="catId">
+                </select>
             </div>
 
             <div class="form-item col-md-10">
                 <label class="label-top">状态：</label>
-                <input id="label_status" class="easyui-validatebox easyui-textbox" prompt="请输入状态" name="status" data-options="required:true, missingMessage:'请输入状态'">
+                <select id="label_status" class="easyui-combobox" data-options="editable:false,panelHeight:null" name="status">
+                    <option value="0" selected>不显示</option>
+                    <option value="1">正常显示</option>
+                </select>
             </div>
 
             <div class="form-item col-md-10">
@@ -52,12 +60,44 @@
             </div>
         </form>
     </div>
+
+    <div id="labelDetailWin" style="display: none;padding-top:30px;padding-left:100px;" title="标签详情">
+        <div class="form-item col-md-10">
+            <label class="label-top">标签名称：</label>
+
+            <label class="label-top labelDetail_labelName"></label>
+        </div>
+
+        <div class="form-item col-md-10">
+            <label class="label-top">所属分类：</label>
+            <label class="label-top labelDetail_catName"></label>
+        </div>
+
+        <div class="form-item col-md-10">
+            <label class="label-top">状态：</label>
+            <label class="label-top labelDetail_status"></label>
+        </div>
+
+        <div class="form-item col-md-10">
+            <label class="label-top">创建人：</label>
+            <label class="label-top labelDetail_creator"></label>
+        </div>
+
+        <div class="form-item col-md-10">
+            <label class="label-top">创建时间：</label>
+            <label class="label-top labelDetail_ctime"></label>
+        </div>
+
+        <div class="form-item col-md-10">
+            <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="closeLabelDetailWin()">关闭</a>
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript">
     ;(function ($, window, document, undefined){
         $('#labelTab').datagrid({
-            url: App.href + '/api/common/label/list',
+            url: App.href + '/api/community/label/list',
             fit: true,
             pagination: true,
             fitColumns: true,
@@ -111,7 +151,7 @@
                     width: 50,
                     formatter: function(value, row, index) {
                         var statusStr = "正常显示";
-                        if(row.status == 1) {
+                        if(row.status == 0) {
                             statusStr = "不显示";
                         }
 
@@ -132,6 +172,26 @@
             ]
         });
 
+        initLabelBaseInfo();
+
+        $('#labelForm').form({
+            url: App.href + '/api/community/label/saveLabel',
+            method: 'POST',
+            onSubmit:function(){
+                return $(this).form('validate');
+            },
+            success:function(data){
+                var obj = JSON.parse(data);
+                if (obj.code == 200) {
+                    App.showMsg('保存成功');
+                    $('#labelWin').window('close');
+                } else {
+                    App.showMsg(obj.message);
+                }
+                refreshLabelTab();
+            }
+        });
+
     })(jQuery, window, document);
 
 
@@ -149,7 +209,19 @@
             modal:true
         });
 
-
+        App.getRequestData("/api/common/category/options", {}, function(data) {
+            data.rows.unshift({id:'', catName:'请选择'});
+            $("#labelDetail_catId").combobox({
+                valueField: 'id',
+                textField: 'catName',
+                editable: false,
+                required: true,
+                mode: 'local',
+                value: '',
+                data: data.rows
+            });
+        });
+        $("#labelDetail_labelName").textbox('setValue', '');
     }
 
     /**
@@ -158,7 +230,10 @@
      * @param id
      */
     function delLabel(id) {
-
+        App.getRequestData('/api/community/label/delLabel', {'id': id}, function(data){
+            App.showMsg("删除标签成功");
+            refreshLabelTab();
+        });
     }
 
     /**
@@ -167,21 +242,69 @@
      * @param id
      */
     function showLabel(id) {
+        $("#labelDetailWin").window({
+            width: "80%",
+            height: "80%",
+            modal:true
+        });
 
+        App.getRequestData('/api/community/label/getLabel', {id: id}, function(data) {
+            $("#labelDetailWin").find(".labelDetail_labelName").text(data.labelName);
+            $("#labelDetailWin").find(".labelDetail_catName").text(data.catName);
+            var statusStr = "不显示";
+            if(data.status == 1) {
+                statusStr = "显示";
+            }
+            $("#labelDetailWin").find(".labelDetail_status").text(statusStr);
+            $("#labelDetailWin").find(".labelDetail_creator").text(data.creator);
+            $("#labelDetailWin").find(".labelDetail_ctime").text(data.ctime);
+        });
     }
 
     /**
      * 保存标签
      */
     function saveLabel() {
+        var catId = $("#labelWin").find('input[name=catId]').val();
 
+        if(catId == 0) {
+            App.showMsg('请选择所属分类');
+            return false;
+        }
+
+        $("#labelForm").submit();
     }
 
     /**
      * 关闭新增标签窗口
      */
     function closeLabelWin() {
+        $("#labelWin").window('close');
+    }
 
+    /**
+     * 初始化标签分类信息
+     */
+    function initLabelBaseInfo() {
+        App.getRequestData("/api/common/category/options", {}, function(data) {
+            data.rows.unshift({id:'', catName:'请选择'});
+            $("#labelList_catId").combobox({
+                valueField: 'id',
+                textField: 'catName',
+                editable: false,
+                required: true,
+                mode: 'local',
+                value: '',
+                data: data.rows
+            });
+        });
+    }
+
+    /**
+     * 关闭详情信息
+     */
+    function closeLabelDetailWin() {
+        $("#labelDetailWin").window('close');
     }
 
 </script>
