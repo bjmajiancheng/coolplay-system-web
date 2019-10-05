@@ -59,7 +59,7 @@
                     if(!treeNode.children || treeNode.children.length == 0) {
                         var sObj = $("#" + treeNode.tId + "_span");
                         if (treeNode.editNameFlag || $("#delBtn_"+treeNode.tId).length>0) return;
-                        var addStr = "<span class='glyphicon glyphicon-minus' id='delBtn_" + treeNode.tId
+                        var addStr = "<span class='fa fa-trash' id='delBtn_" + treeNode.tId
                             + "' title='del node' onfocus='this.blur();'></span>";
                         sObj.after(addStr);
                         var btn = $("#delBtn_"+treeNode.tId);
@@ -73,7 +73,7 @@
                     if(!treeNode.pId) {
                         var sObj = $("#" + treeNode.tId + "_span");
                         if (treeNode.editNameFlag || $("#addBtn_"+treeNode.tId).length>0) return;
-                        var addStr = "<span class='glyphicon glyphicon-plus' id='addBtn_" + treeNode.tId
+                        var addStr = "<span class='fa fa-plus-circle' id='addBtn_" + treeNode.tId
                             + "' title='add node' onfocus='this.blur();'></span>";
                         sObj.after(addStr);
                         var btn = $("#addBtn_"+treeNode.tId);

@@ -525,4 +525,12 @@
         }
     }
 
+    $("#index_btn").on('click', function() {
+        window.location.href = App.href + "/index.html";
+    });
+
+    $("#toLogin_btn").on('click', function(){
+        window.location.href = App.href + "/login.html";
+    });
+
 })(jQuery, window, document);
