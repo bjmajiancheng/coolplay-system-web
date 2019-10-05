@@ -5,85 +5,204 @@
     <title>帮助管理</title>
 </head>
 <body>
-<div class="super-theme-example">
-    <div class="search-form-item col-md-4">
-        <label class="label-top">：</label>
-        <input name="" class="easyui-validatebox easyui-textbox" prompt="请输入">
-    </div>
 
-    <div class="search-form-item col-md-3">
-        <a href="javascript:void(0)" onclick="refreshHelpTab()" class="easyui-linkbutton primary">查询</a>
+<div class="easyui-layout post-detail" style="width:100%;height:100%;">
+    <div data-options="region:'west',title:'',split:true" style="width:20%;">
+        <div class="search-form-item col-md-10" style="padding-top:10px;">
+            <a href="javascript:void(0)" onclick="addTreeNode(null)" class="easyui-linkbutton primary">新增</a>
+        </div>
+        <div class="clear"></div>
+        <div class="content_wrap">
+            <div class="">
+                <ul id="treeDemo" class="ztree ztree_help"></ul>
+            </div>
+        </div>
+    </div>
+    <div data-options="region:'center',title:''" style="padding:5px;">
+        <form id="helpDetailForm" method="post">
+            <input type="hidden" name="id" />
+            <div class="form-item col-md-11" style="padding:10px;">
+                <label class="label-top">帮助标题：</label>
+                <input id="help_helpTitle" class="easyui-validatebox easyui-textbox" prompt="请输入帮助标题" name="helpTitle" data-options="required:true, missingMessage:'请输入帮助标题'">
+            </div>
+
+
+            <div class="form-item col-md-11" style="padding:10px; height:300px;">
+                <label class="label-top">帮助内容：</label>
+
+                <input type="hidden" name="helpContent"/>
+
+                <div class="easyui-texteditor" id="help_helpContentDiv" title="帮助内容" style="width:90%;height:300px;padding:20px;left:126px;top:0px;">
+
+                </div>
+            </div>
+
+            <div class="form-item col-md-11 align_center">
+                <a href="javascript:void(0)" onclick="updateHelp()" class="easyui-linkbutton primary">提交修改</a>
+            </div>
+        </form>
     </div>
 </div>
 
-<div class="clear"></div>
-<div class="super-theme-example">
-    <div style="height: 400px;">
-        <table id="helpTab"></table>
-    </div>
-</div>
 
 <script type="text/javascript">
     ;(function ($, window, document, undefined){
-        $('#helpTab').datagrid({
-            url: App.href + '/api/common/help/list',
-            fit: true,
-            pagination: true,
-            fitColumns: true,
-            method: 'GET',
-            pageSize: 10,
-            pageList: [10, 25, 50, 100, 200],
-            height: 400,
-            queryParams: {},
-            toolbar: [],
-            loadFilter: function(data) {
-                if (data.code === 401) {
-                    App.showMsg('token失效,请登录!');
-                    window.location.href = App.href + '/login.html';
-                    return {"total":0, "rows": "[]"};
-                } else {
-                    return data;
+
+        var setting = {
+            view: {
+                showLine: false,
+                showIcon: false,
+                selectedMulti: false,
+                dblClickExpand: false,
+                addHoverDom: function (treeId, treeNode) {
+                    //叶子节点 -- 渲染删除按钮
+                    if(!treeNode.children || treeNode.children.length == 0) {
+                        var sObj = $("#" + treeNode.tId + "_span");
+                        if (treeNode.editNameFlag || $("#delBtn_"+treeNode.tId).length>0) return;
+                        var addStr = "<span class='glyphicon glyphicon-minus' id='delBtn_" + treeNode.tId
+                            + "' title='del node' onfocus='this.blur();'></span>";
+                        sObj.after(addStr);
+                        var btn = $("#delBtn_"+treeNode.tId);
+                        if (btn) btn.bind("click", function(){
+                            delTreeNode(treeNode);
+                            return false;
+                        });
+                    }
+
+                    //父节点 -- 渲染添加子节点按钮
+                    if(!treeNode.pId) {
+                        var sObj = $("#" + treeNode.tId + "_span");
+                        if (treeNode.editNameFlag || $("#addBtn_"+treeNode.tId).length>0) return;
+                        var addStr = "<span class='glyphicon glyphicon-plus' id='addBtn_" + treeNode.tId
+                            + "' title='add node' onfocus='this.blur();'></span>";
+                        sObj.after(addStr);
+                        var btn = $("#addBtn_"+treeNode.tId);
+                        if (btn) btn.bind("click", function(){
+                            addTreeNode(treeNode);
+                            return false;
+                        });
+                    }
+                },
+                removeHoverDom: function (treeId, treeNode) {
+                    $("#addBtn_"+treeNode.tId).unbind().remove();
+                    $("#delBtn_"+treeNode.tId).unbind().remove();
                 }
             },
-            onBeforeLoad: function (param) {
-                var roleName = $("input[name=roleName]").val();
-
-                param.roleName = roleName;
+            data: {
+                simpleData: {
+                    enable: true
+                }
             },
-            columns: [
-                [{
-                    field: 'id',
-                    title: '序号',
-                    sortable: true,
-                    width: 50
-                }, {
-                    field: 'roleName',
-                    title: '角色名称',
-                    width: 50
-                }, {
-                    field: 'ctime',
-                    title: '创建时间',
-                    width: 50
-                }, {
-                    field: 'custom_col1',
-                    title: '操作',
-                    width: 50,
-                    align: 'center',
-                    formatter: function(value, row, index) {
-                        var btns = new Array();
-                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="updateRole(' + row.id + ')">绑定权限</a>&nbsp;');
-                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="delRole(' + row.id + ')">删除</a>');
-                        return btns.join('');
+            callback: {
+                beforeClick: function (treeId, treeNode) {
+                    if (treeNode.level == 0 ) {
+                        var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+                        zTree.expandNode(treeNode);
+                        return true;
                     }
-                }]
-            ]
+                    return true;
+                },
+                onAsyncSuccess: function (event, treeId, treeNode, msg) {
+                    var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+                    zTree.expandAll(true);
+                },
+                onClick: function(event, treeId, treeNode, clickFlag) {
+                    var helpId = treeNode.id;
+                    App.getRequestData('/api/common/help/getHelp', {id: helpId}, function(data) {
+                        $("#helpDetailForm").find("input[name=id]").val(data.id);
+                        $("#help_helpTitle").textbox('setValue', data.helpTitle);
+                        $("#help_helpContentDiv").texteditor('setValue', data.helpContent);
+                    });
+                }
+            },
+            async: {
+                enable: true,
+                url: App.href + '/api/common/help/treeNodes',
+                type: "POST",
+                autoParam: ["id", "name", "pId"]
+            }
+        };
+
+        var treeObj = $("#treeDemo");
+        $.fn.zTree.init(treeObj, setting);
+
+        treeObj.hover(function () {
+            if (!treeObj.hasClass("showIcon")) {
+                treeObj.addClass("showIcon");
+            }
+        }, function() {
+            treeObj.removeClass("showIcon");
         });
 
+
+        $('#helpDetailForm').form({
+            url: App.href + '/api/common/help/updateHelp',
+            method: 'POST',
+            onSubmit:function(){
+                return $(this).form('validate');
+            },
+            success:function(data){
+                var obj = JSON.parse(data);
+                if (obj.code == 200) {
+                    App.showMsg('保存成功');
+                } else {
+                    App.showMsg(obj.message);
+                }
+                refreshHelpTree();
+            }
+        });
     })(jQuery, window, document);
 
+    /**
+     * 添加节点
+     * @param parentTreeNode
+     */
+    function addTreeNode(parentTreeNode) {
+        App.prompt('请输入新增标题名称：', function(data) {
+            var parentId = 0;
+            if(parentTreeNode) {
+                parentId = parentTreeNode.id;
+            }
+            App.getRequestData('/api/common/help/saveHelp', {parentId: parentId, helpTitle: data}, function(data) {
+                App.showMsg('添加成功');
 
-    function refreshHelpTab() {
-        $('#helpTab').datagrid('reload');
+                var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+                zTree.addNodes(parentTreeNode, {id: data.id, pId: parentId, name: data.helpTitle});
+            });
+        });
+    }
+
+    /**
+     * 删除节点
+     * @param treeNode
+     */
+    function delTreeNode(treeNode){
+        App.confirm('确定删除'+ treeNode.name +'吗?', function(){
+            App.getRequestData('/api/common/help/delHelp', {id: treeNode.id}, function(data) {
+                App.showMsg('删除' + treeNode.name + '操作成功');
+
+                var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+                zTree.removeNode(treeNode);
+            });
+        });
+    }
+
+    /**
+     * 更新帮助信息
+     */
+    function updateHelp() {
+        var helpContentVal = $("#help_helpContentDiv").texteditor('getValue');
+
+        $("#helpDetailForm").find("input[name=helpContent]").val(helpContentVal);
+        $("#helpDetailForm").submit();
+    }
+
+    /**
+     * 刷新树节点
+     */
+    function refreshHelpTree() {
+        var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
+        treeObj.reAsyncChildNodes(null, "refresh");
     }
 
 </script>
