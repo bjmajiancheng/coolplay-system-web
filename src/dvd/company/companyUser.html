@@ -45,6 +45,10 @@
             <label class="label-top userNameLabel"></label>
         </div>
         <div class="form-item col-md-10">
+            <label class="label-top">显示名称：</label>
+            <label class="label-top displayNameLabel"></label>
+        </div>
+        <div class="form-item col-md-10">
             <label class="label-top">所属部门：</label>
             <label class="label-top deptNameLabel"></label>
         </div>
@@ -304,6 +308,7 @@
         App.getRequestData('/api/company/companyUser/getCompanyUser', {'userId': userId}, function(data) {
 
             $(".userNameLabel").text(data.userName);
+            $(".displayNameLabel").text(data.displayName);
             $(".deptNameLabel").text(data.deptName);
             $(".userRoleLabel").text(data.roleName);
             $(".companyUser_contactPhoneLabel").text(data.contactPhone);
