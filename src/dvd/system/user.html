@@ -35,7 +35,7 @@
             <input name="id" type="hidden" />
             <div class="form-item col-md-10">
                 <label class="label-top">账户：</label>
-                <input id="user_userName" name="userName" class="easyui-validatebox easyui-textbox" prompt="请输入账户" data-options="required:true, missingMessage:'请输入账号'">
+                <input id="user_userName" name="userName" class="easyui-validatebox easyui-textbox" prompt="请输入账户" data-options="required:true, missingMessage:'请输入账号'" disabled="disabled">
             </div>
             <div class="form-item col-md-10">
                 <label class="label-top">角色：</label>
@@ -43,7 +43,7 @@
             </div>
             <div class="form-item col-md-10">
                 <label class="label-top">联系电话：</label>
-                <input id="user_contactPhone" name="contactPhone" class="easyui-validatebox easyui-textbox" prompt="请输入联系电话" data-options="required:true, missingMessage:'请输入联系电话'">
+                <input id="user_contactPhone" name="contactPhone" class="easyui-validatebox easyui-textbox" prompt="请输入联系电话" data-options="required:true, missingMessage:'请输入联系电话', validType:'telephone'">
             </div>
             <div class="form-item col-md-10">
                 <label class="label-top">账号状态：</label>
@@ -256,6 +256,7 @@
         });
         $('#systemUserWin').window({title: '添加用户'});
 
+        $("#user_userName").textbox({disabled:false});
         $("#systemUserForm").find("input[name=id]").val('');
         $("#user_userName").textbox('setValue', '');
         $("#userRoleId").combobox('setValue', '0');
@@ -307,6 +308,8 @@
             modal:true
         });
         $('#systemUserWin').window({title: '用户修改'});
+
+        $("#user_userName").textbox({disabled:true});
 
         App.getRequestData('/api/core/user/getUser', {'userId': userId}, function(data) {
             $("#systemUserForm").find("input[name=id]").val(data.id);
