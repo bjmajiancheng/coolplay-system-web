@@ -74,5 +74,9 @@
     };
     $(document).ready(function () {
         initLogin();
+
+        $("#forgetPass_btn").on('click', function() {
+            window.location.href = App.href + "/forgetPass.html";
+        });
     });
 })(jQuery, window, document);
