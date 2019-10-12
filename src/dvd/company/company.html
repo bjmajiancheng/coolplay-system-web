@@ -105,7 +105,8 @@
 
             <div class="clear"></div>
 
-            <div class="form-item col-md-10 align_center">
+
+            <div class="form-item col-md-10 align_center control_btn">
                 <a href="javascript:void(0)" onclick="passCompany()" class="easyui-linkbutton primary">通过</a>
                 <a href="javascript:void(0)" onclick="rejectCompany()" class="easyui-linkbutton primary">不通过</a>
             </div>
@@ -150,7 +151,7 @@
             },
             columns: [
                 [{
-                    field: 'id',
+                    field: 'adminUserName',
                     title: '用户账号',
                     sortable: true,
                     width: 50
@@ -271,6 +272,12 @@
             App.showImage("businessLicenseUrlDiv", data.businessLicenseUrl);
             App.showImage("idcardPositivePhotoDiv", data.idcardPositivePhoto);
             App.showImage("idcardNegativePhotoDiv", data.idcardNegativePhoto);
+
+            if(data.reviewStatus == 1) {
+                $(".control_btn").hide();
+            } else if(data.reviewStatus == 0) {
+                $(".control_btn").show();
+            }
         });
 
 

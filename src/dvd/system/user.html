@@ -39,7 +39,9 @@
             </div>
             <div class="form-item col-md-10">
                 <label class="label-top">角色：</label>
-                <input id="userRoleId" name="roleId" class="easyui-combobox">
+
+                <input id="userRoleId" name="roleIds" class="easyui-combobox">
+
             </div>
             <div class="form-item col-md-10">
                 <label class="label-top">联系电话：</label>
@@ -148,8 +150,11 @@
                     align: 'center',
                     formatter: function(value, row, index) {
                         var btns = new Array();
-                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="updateUserEnabled('+ row.id +', 1);">启用</a>&nbsp;');
-                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="updateUserEnabled('+ row.id +', 0);">禁用</a>&nbsp;');
+                        if(row.enabled == 0) {
+                            btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="updateUserEnabled('+ row.id +', 1);">启用</a>&nbsp;');
+                        } else if(row.enabled == 1) {
+                            btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="updateUserEnabled('+ row.id +', 0);">禁用</a>&nbsp;');
+                        }
                         btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="userDetail('+ row.id +')">查看</a>&nbsp;');
                         btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="editUser('+ row.id +')">修改</a>');
                         return btns.join('');
@@ -197,6 +202,7 @@
                 valueField: 'id',
                 textField: 'roleName',
                 editable: false,
+                multiple: true,
                 required: true,
                 mode: 'local',
                 value: '0',
@@ -316,7 +322,7 @@
             $('#systemUserForm').form({'url': App.href + '/api/core/user/updateUser'});
 
             $("#user_userName").textbox('setValue', data.userName);
-            $("#userRoleId").combobox('setValue', data.roleId);
+            $("#userRoleId").combobox('setValue', data.roleIds);
             $("#user_contactPhone").textbox('setValue', data.contactPhone);
             $("#user_enabled").combobox('setValue', data.enabled);
         });
