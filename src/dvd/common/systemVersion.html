@@ -112,7 +112,15 @@
                     width: 50,
                     align: 'center',
                     formatter: function(value, row, index) {
-                        return '<a href="'+ row.appUrl +'" class="easyui-linkbutton primary" target="_blank">下载</a>';
+                        if(row.appUrl == '') {
+                            return "无软件包";
+                        }
+
+                        var fileUrl = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+                        //获取文件原名称
+                        var fileName = fileUrl.substring(fileUrl.indexOf("_") + 5);
+
+                        return '<a href="'+ row.appUrl +'" class="easyui-linkbutton primary" target="_blank">' + fileName + '</a>';
                     }
                 }, {
                     field: 'custom_col1',

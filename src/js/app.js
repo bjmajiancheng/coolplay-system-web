@@ -614,11 +614,6 @@
                     data.deleteHandle();
                 }
             });
-
-            if(data.defaultVal !== undefined) {
-
-                successIcon.show();
-            }
         }
         return ele;
     }
