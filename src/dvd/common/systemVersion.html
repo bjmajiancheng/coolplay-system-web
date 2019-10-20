@@ -116,7 +116,7 @@
                             return "无软件包";
                         }
 
-                        var fileUrl = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+                        var fileUrl = row.appUrl.substring(row.appUrl.lastIndexOf("/") + 1);
                         //获取文件原名称
                         var fileName = fileUrl.substring(fileUrl.indexOf("_") + 5);
 
