@@ -372,7 +372,7 @@
     }
 
     /**
-     * 上传文件
+     * 上传图片
      *
      * @param data
      */
@@ -404,7 +404,7 @@
                 form._refreshItem(data.name);
             });*/
             // 上传
-            var uploadFile = function () {
+            var uploadImage = function () {
                 if (ele.find("[role='file']").val() == "") {
                     return;
                 } else {
@@ -486,14 +486,138 @@
             };
             if (data.autoUpload) {
                 ele.find('[role="file"]').on("change", function () {
-                    uploadFile();
+                    uploadImage();
                 });
             } else {
                 var upload = $('<a href="javascript:;" role="upload" data-dismiss="fileinput" class="btn btn-primary fileinput-exists">上传 </a>');
                 ele.find("[role='imageDiv']").append(upload);
                 upload.on("click", function () {
+                    uploadImage();
+                });
+            }
+        }
+        return ele;
+    }
+
+    /**
+     * 上传文件
+     *
+     * @param data
+     */
+    App.uploadFile = function(data) {
+        var fileTmpl = '<div><div class="fileinput fileinput-new" data-provides="fileinput">'
+            + '<div class="input-group input-large">'
+            + '<div class="form-control uneditable-input span3" data-trigger="fileinput">'
+            + '<i class="fa fa-file fileinput-exists"></i>&nbsp; <span class="fileinput-filename "></span>'
+            + '</div>'
+            + '<span class="input-group-addon btn btn-default btn-file">'
+            + '<span class="fileinput-new">选择文件 </span>'
+            + '<span class="fileinput-exists">变更 </span>'
+            + '<input drole="main" type="text" role="file-input" id="${id_}" name="${name_}" value="" style="display:none;"><input type="file" role="file" id="file_${id_}" name="file"/>'
+            + '</span>'
+            + '<a href="javascript:;" class="input-group-addon btn btn-danger fileinput-exists" data-dismiss="fileinput">删除 </a>'
+            + '</div></div></div>';
+        var ele = $.tmpl(fileTmpl, {
+            "id_": (data.id === undefined ? data.name : data.id),
+            "name_": data.name
+        });
+        if (data.uploadUrl === undefined) {
+            data.uploadUrl = App.href + "/api/common/uploadFile";
+        }
+        if (data.isAjaxUpload) {
+
+            var uploadFile = function () {
+                if ($("#file_" + data.id).val() == "") {
+                    return;
+                } else {
+                    if (data.allowTypes !== undefined) {
+                        var file = ele.find("[role='file']").val();
+                        var type = file.substring(file.lastIndexOf("."));
+                        var allowTypes = data.allowTypes.split(",")
+                        var flag = false;
+                        for (var i in allowTypes) {
+                            if (type.toLowerCase().replace(".", "") == allowTypes[i].toLowerCase().replace(".", "")) {
+                                flag = true;
+                            }
+                        }
+                        if (!flag) {
+                            alert("只允许上传" + data.allowTypes);
+                            return;
+                        }
+                    }
+                }
+                $
+                    .ajaxFileUpload({
+                        url: data.uploadUrl,
+                        type: "POST",
+                        secureuri: false,
+                        fileElementId: "file_" + data.id,
+                        dataType: "json",
+                        success: function (json, status) {
+                            if (json.code === 200) {
+                                json = json.data;
+                                if (data.onSuccess !== undefined) {
+                                    data.onSuccess(json, form);
+                                    successIcon.show();
+                                } else {
+                                    if (json.attachmentUrl !== undefined) {
+                                        ele.find("[role='file-input']")
+                                            .attr("value", json.attachmentUrl);
+                                        successIcon.show();
+                                    } else {
+                                        console
+                                            .error("返回的json数据中未检测到attachmentUrl值");
+                                    }
+                                }
+
+                                ele.find('[role="file"]').on("change", function () {
+                                    uploadFile();
+                                });
+                            } else {
+                                if (data.onError !== undefined) {
+                                    data.onError(json, form);
+                                    successIcon.show();
+                                } else {
+                                    App.showMsg(json.message);
+                                }
+
+                            }
+                        },
+                        error: function (data, status, e) {
+                            App.showMsg(e);
+                        }
+                    });
+            };
+            if (data.autoUpload) {
+                ele.find('[role="file"]').on("change", function () {
                     uploadFile();
                 });
+            } else {
+                var upload = $('<a href="javascript:;" role="upload" class="input-group-addon btn btn-primary fileinput-exists">上传 </a>');
+                ele.find(".input-group").append(upload);
+                upload.click(function () {
+                    uploadFile();
+                });
+            }
+            var successIcon = $('<a href="javascript:;" class="input-group-addon btn" style="border-color: white;background:white;cursor:default;"><span class="glyphicon glyphicon-ok" style="color: #45B6AF;cursor:default;"></span></a>');
+            successIcon.hide();
+            ele.find(".input-group").append(successIcon);
+            ele.find('[data-dismiss="fileinput"]').click(function () {
+                var file_input = ele.find("[role='file']");
+                file_input.attr("value", '');
+                file_input.parent().parent().parent().removeClass("fileinput-exists")
+                    .addClass("fileinput-new");
+                file_input.parent().parent().parent().find(
+                    "span.fileinput-filename ").text('');
+
+                if (data.deleteHandle !== undefined) {
+                    data.deleteHandle();
+                }
+            });
+
+            if(data.defaultVal !== undefined) {
+
+                successIcon.show();
             }
         }
         return ele;
@@ -531,7 +655,26 @@
                     10))
             preview.html($img);
         }
-    }
+    };
+
+    /**
+     * 展示文件信息
+     *
+     * @param ele
+     * @param fileUrl
+     */
+    App.showFile = function(ele, fileUrl) {
+        var file_input = $("#"+ele).find("[role='file-input']");
+        file_input.attr("value", fileUrl);
+        file_input.parent().parent().parent().removeClass("fileinput-new")
+            .addClass("fileinput-exists");
+        //获得文件全名称
+        fileUrl = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+        //获取文件原名称
+        fileUrl = fileUrl.substring(fileUrl.indexOf("_") + 5);
+        file_input.parent().parent().parent().find(
+            "span.fileinput-filename ").text(fileUrl);
+    };
 
     $("#index_btn").on('click', function() {
         window.location.href = App.href + "/index.html";
