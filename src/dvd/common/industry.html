@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>行业管理</title>
+</head>
+<body>
+<div class="super-theme-example">
+    <div class="search-form-item col-md-4">
+        <label class="label-top">行业名称：</label>
+        <input name="industryName" class="easyui-validatebox easyui-textbox" prompt="请输入行业名称">
+    </div>
+
+    <div class="search-form-item col-md-3">
+        <a href="javascript:void(0)" onclick="refreshIndustryTab()" class="easyui-linkbutton primary">查询</a>
+        <a href="javascript:void(0)" onclick="addIndustry()" class="easyui-linkbutton primary">添加行业信息</a>
+    </div>
+</div>
+
+<div class="clear"></div>
+<div class="super-theme-example">
+    <div style="height: 400px;">
+        <table id="industryTab"></table>
+    </div>
+
+    <div id="industryWin" style="display: none;padding-top:30px;padding-left:100px;" title="新增行业信息">
+        <form id="industryForm" method="post">
+            <input name="id" type="hidden" />
+            <div class="form-item col-md-10">
+                <label class="label-top">行业名称：</label>
+                <input id="industry_industryName" class="easyui-validatebox easyui-textbox" prompt="请输入行业名称" name="industryName" data-options="required:true, missingMessage:'请输入行业名称'">
+            </div>
+            <div class="form-item col-md-10">
+                <label class="label-top">行业备注：</label>
+                <input id="industry_industryDesc" class="easyui-validatebox easyui-textbox" prompt="请输入行业备注" name="industryDesc"
+                       labelPosition="top" multiline="true" style="width:80%;height:120px" data-options="required:true, missingMessage:'请输入行业备注'">
+            </div>
+            <div class="form-item col-md-10">
+                <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="saveIndustryInfo()">保存</a>
+                <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="cancelIndustryInfo()">取消</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    ;(function ($, window, document, undefined){
+        $('#industryTab').datagrid({
+            url: App.href + '/api/common/industry/list',
+            fit: true,
+            pagination: true,
+            fitColumns: true,
+            method: 'GET',
+            pageSize: 10,
+            pageList: [10, 25, 50, 100, 200],
+            height: 400,
+            queryParams: {},
+            toolbar: [],
+            loadFilter: function(data) {
+                if (data.code === 401) {
+                    App.showMsg('token失效,请登录!');
+                    window.location.href = App.href + '/login.html';
+                    return {"total":0, "rows": "[]"};
+                } else {
+                    return data;
+                }
+            },
+            onBeforeLoad: function (param) {
+                var industryName = $("input[name=industryName]").val();
+
+                param.industryName = industryName;
+            },
+            columns: [
+                [{
+                    field: 'id',
+                    title: '序号',
+                    sortable: true,
+                    width: 50
+                }, {
+                    field: 'industryName',
+                    title: '行业名称',
+                    width: 50
+                }, {
+                    field: 'industryDesc',
+                    title: '行业备注',
+                    width: 50
+                }, {
+                    field: 'ctime',
+                    title: '创建时间',
+                    width: 50
+                }, {
+                    field: 'custom_col1',
+                    title: '操作',
+                    width: 50,
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var btns = new Array();
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="delIndustry(' + row.id + ')">删除</a>&nbsp;&nbsp;&nbsp;&nbsp;');
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="editIndustry(' + row.id + ')">修改</a>');
+                        return btns.join('');
+                    }
+                }]
+            ]
+        });
+
+        $('#industryForm').form({
+            url: App.href + '/api/common/industry/saveIndustry',
+            method: 'POST',
+            onSubmit:function(){
+                return $(this).form('validate');
+            },
+            success:function(data){
+                var obj = JSON.parse(data);
+                if (obj.code == 200) {
+                    App.showMsg('保存成功');
+                    $('#industryWin').window('close');
+                } else {
+                    App.showMsg(obj.message);
+                }
+                refreshIndustryTab();
+            }
+        });
+
+    })(jQuery, window, document);
+
+    function refreshIndustryTab() {
+        $('#industryTab').datagrid('reload');
+    }
+
+    /**
+     * 删除行业信息
+     *
+     * @param id
+     */
+    function delIndustry(id) {
+        App.getRequestData('/api/common/industry/delIndustry', {id: id}, function(data) {
+            App.showMsg("删除行业信息成功");
+            refreshIndustryTab();
+        });
+    }
+
+    /**
+     * 修改行业信息
+     *
+     * @param id
+     */
+    function editIndustry(id) {
+        $("#industryWin").window({
+            width: "80%",
+            height: "80%",
+            modal:true
+        });
+
+        $('#industryWin').window({title: '修改行业信息'});
+        $('#industryForm').form({'url': App.href + '/api/common/industry/updateIndustry'});
+
+        App.getRequestData('/api/common/industry/detail', {id: id}, function(data) {
+            $("#industryForm").find('input[name=id]').val(data.id);
+            $("#industry_industryName").textbox('setValue', data.industryName);
+            $("#industry_industryDesc").textbox('setValue', data.industryDesc);
+        });
+    }
+
+    /**
+     * 新增行业信息
+     */
+    function addIndustry() {
+        $("#industryWin").window({
+            width: "80%",
+            height: "80%",
+            modal:true
+        });
+
+        $("#industryForm").find('input[name=id]').val('');
+        $("#industry_industryName").textbox('setValue', '');
+        $("#industry_industryDesc").textbox('setValue', '');
+    }
+
+    /**
+     * 保存行业信息
+     */
+    function saveIndustryInfo() {
+        $("#industryForm").submit();
+    }
+
+    /**
+     * 取消新增行业信息
+     */
+    function cancelIndustryInfo() {
+        $("#industryWin").window('close');
+    }
+
+</script>
+</body>
+</html>
