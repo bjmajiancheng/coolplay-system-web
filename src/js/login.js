@@ -27,9 +27,17 @@
             "type_": 'warning',
             "alert_": alertText
         });
-        $("#login-form").prepend(alertDiv);
-        alertDiv.delay(5 * 1000).fadeOut();
-        App.scrollTo(alertDiv, -200);
+        if($('div[role=alert]').size() == 0) {
+            $("#login-form").prepend(alertDiv);
+            alertDiv.delay(5 * 1000).fadeOut();
+            App.scrollTo(alertDiv, -200);
+        } else {
+            $('div[role=alert]').show();
+            $('div[role=alert]').text(alertText);
+
+            $('div[role=alert]').delay(5 * 1000).fadeOut();
+            App.scrollTo($('div[role=alert]'), -200);
+        }
     }
 
     var login = function () {
