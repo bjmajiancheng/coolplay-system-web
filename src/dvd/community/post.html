@@ -132,12 +132,12 @@
             onBeforeLoad: function (param) {
                 var postTitle = $("input[name=postTitle]").val();
                 var publicUserName = $("input[name=publicUserName]").val();
-                var labelName = $("input[name=labelName]").val();
+                var labelId = $("input[name=labelId]").val();
                 var isTop = $("input[name=isTop]").val();
 
                 param.postTitle = postTitle;
                 param.publicUserName = publicUserName;
-                param.labelName = labelName;
+                param.labelId = labelId;
                 param.isTop = isTop;
             },
             columns: [

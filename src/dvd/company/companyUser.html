@@ -9,7 +9,7 @@
     <div class="search-form-item col-md-4">
         <label class="label-top">企业名称：</label>
         <!--<input name="companyName" class="easyui-validatebox easyui-textbox" prompt="请输入企业名称">-->
-        <input id="companyUser_companyName" name="companyId" class="easyui-combobox">
+        <input id="companyUser_companyId" name="companyId" class="easyui-combobox">
     </div>
 
     <div class="search-form-item col-md-4">
@@ -128,15 +128,12 @@
                 }
             },
             onBeforeLoad: function (param) {
-                var companyName = $(".companyLogSearch").find("input[name=companyName]").val();
                 var userName = $(".companyLogSearch").find("input[name=userName]").val();
-                var contactMobile = $(".companyLogSearch").find("input[name=contactMobile]").val();
+                var contactPhone = $(".companyLogSearch").find("input[name=contactPhone]").val();
                 var companyId = $(".companyLogSearch").find("input[name=companyId]").val();
 
-
-                param.companyName = companyName;
                 param.userName = userName;
-                param.contactMobile = contactMobile;
+                param.contactPhone = contactPhone;
                 param.companyId = companyId;
             },
             columns: [
@@ -386,7 +383,7 @@
         // 获取公司角色信息
         App.getRequestData("/api/system/company/companyOptions", {}, function(data) {
             data.rows.unshift({id:'', companyName:'请选择'});
-            $("#companyUser_companyName").combobox({
+            $("#companyUser_companyId").combobox({
                 valueField: 'id',
                 textField: 'companyName',
                 editable: false,
