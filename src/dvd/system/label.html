@@ -14,7 +14,7 @@
     <div class="search-form-item col-md-4">
         <label class="label-top">所属分类：</label>
 
-        <select class="easyui-combobox" data-options="editable:false,panelHeight:null" name="label_catId" id="labelList_catId">
+        <select class="easyui-combobox" data-options="editable:false,panelHeight:null" name="labelList_catId" id="labelList_catId">
 
         </select>
 
@@ -118,7 +118,7 @@
             },
             onBeforeLoad: function (param) {
                 var labelName = $("input[name=labelName]").val();
-                var catId = $("input[name=catId]").val();
+                var catId = $("input[name=labelList_catId]").val();
 
                 param.labelName = labelName;
                 param.catId = catId;

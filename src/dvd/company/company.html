@@ -98,11 +98,11 @@
                 <input id="companyDetail_adminPassword" name="adminPassword" class="easyui-textbox" prompt="请输入后台密码">
             </div>
 
-            <div class="form-item col-md-10">
+            <!--<div class="form-item col-md-10">
                 <label class="label-top">原因：</label>
                 <input id="companyDetail_rejectReason" name="rejectReason" class="easyui-textbox" prompt="请输入原因">
-            </div>
-
+            </div>-->
+            <input type="hidden" name="rejectReason" />
             <div class="clear"></div>
 
 
@@ -263,7 +263,7 @@
 
             $("#companyDetail_adminUserName").textbox('setValue', data.adminUserName);
             $("#companyDetail_adminPassword").textbox('setValue', data.adminPassword);
-            $("#companyDetail_rejectReason").textbox('setValue', data.rejectReason);
+            //$("#companyDetail_rejectReason").textbox('setValue', data.rejectReason);
 
             $("#businessLicenseUrl").attr('value', data.businessLicenseUrl);
             $("#idcardPositivePhoto").attr('value', data.idcardPositivePhoto);
@@ -359,18 +359,21 @@
      * 审核不通过企业信息
      */
     function rejectCompany() {
-        var rejectReason = $("#companyDetailForm").find("input[name=rejectReason]").val();
+        App.prompt('请输入不通过原因', function(data){
+            $("#companyDetailForm").find("input[name=rejectReason]").val(data);
+
+            $("#companyDetailForm").find("input[name=status]").val(2);
+
+            if(validateCompany()) {
+                $("#companyDetailForm").submit();
+            }
+        });
+        /*var rejectReason = $("#companyDetailForm").find("input[name=rejectReason]").val();
 
         if(rejectReason == undefined || rejectReason == '') {
             App.showMsg('请输入不通过原因');
             return false;
-        }
-
-        $("#companyDetailForm").find("input[name=status]").val(2);
-
-        if(validateCompany()) {
-            $("#companyDetailForm").submit();
-        }
+        }*/
     }
 
     function refreshCompany() {

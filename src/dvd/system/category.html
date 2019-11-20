@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>分类管理</title>
+</head>
+<body>
+<div class="super-theme-example">
+    <div class="search-form-item col-md-4">
+        <label class="label-top">分类名称：</label>
+        <input name="catName" class="easyui-validatebox easyui-textbox" prompt="请输入分类名称">
+    </div>
+
+    <div class="search-form-item col-md-3">
+        <a href="javascript:void(0)" onclick="refreshCategoryTab()" class="easyui-linkbutton primary">查询</a>
+        <a href="javascript:void(0)" onclick="addCategory()" class="easyui-linkbutton primary">添加分类信息</a>
+    </div>
+</div>
+
+<div class="clear"></div>
+<div class="super-theme-example">
+    <div style="height: 400px;">
+        <table id="categoryTab"></table>
+    </div>
+
+    <div id="categoryWin" style="display: none;padding-top:30px;padding-left:100px;" title="新增分类信息">
+        <form id="categoryForm" method="post">
+            <input name="id" type="hidden" />
+            <div class="form-item col-md-10">
+                <label class="label-top">分类名称：</label>
+                <input id="category_catName" class="easyui-validatebox easyui-textbox" prompt="请输入分类名称" name="catName" data-options="required:true, missingMessage:'请输入分类名称'">
+            </div>
+            <div class="form-item col-md-10">
+                <label class="label-top">分类备注：</label>
+                <input id="category_catDesc" class="easyui-validatebox easyui-textbox" prompt="请输入分类备注" name="catDesc"
+                       labelPosition="top" multiline="true" style="width:80%;height:120px" data-options="required:true, missingMessage:'请输入分类备注'">
+            </div>
+            <div class="form-item col-md-10">
+                <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="saveCategoryInfo()">保存</a>
+                <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="cancelCategoryInfo()">取消</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    ;(function ($, window, document, undefined){
+        $('#categoryTab').datagrid({
+            url: App.href + '/api/common/category/list',
+            fit: true,
+            pagination: true,
+            fitColumns: true,
+            method: 'GET',
+            pageSize: 10,
+            pageList: [10, 25, 50, 100, 200],
+            height: 400,
+            queryParams: {},
+            toolbar: [],
+            loadFilter: function(data) {
+                if (data.code === 401) {
+                    App.showMsg('token失效,请登录!');
+                    window.location.href = App.href + '/login.html';
+                    return {"total":0, "rows": "[]"};
+                } else {
+                    return data;
+                }
+            },
+            onBeforeLoad: function (param) {
+                var catName = $("input[name=catName]").val();
+
+                param.catName = catName;
+            },
+            columns: [
+                [{
+                    field: 'id',
+                    title: '序号',
+                    sortable: true,
+                    width: 50
+                }, {
+                    field: 'catName',
+                    title: '分类名称',
+                    width: 50
+                }, {
+                    field: 'catDesc',
+                    title: '分类备注',
+                    width: 50
+                }, {
+                    field: 'ctime',
+                    title: '创建时间',
+                    width: 50
+                }, {
+                    field: 'custom_col1',
+                    title: '操作',
+                    width: 50,
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var btns = new Array();
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="delCategory(' + row.id + ')">删除</a>&nbsp;&nbsp;&nbsp;&nbsp;');
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="editCategory(' + row.id + ')">修改</a>');
+                        return btns.join('');
+                    }
+                }]
+            ]
+        });
+
+        $('#categoryForm').form({
+            url: App.href + '/api/common/category/saveCategory',
+            method: 'POST',
+            onSubmit:function(){
+                return $(this).form('validate');
+            },
+            success:function(data){
+                var obj = JSON.parse(data);
+                if (obj.code == 200) {
+                    App.showMsg('保存成功');
+                    $('#categoryWin').window('close');
+                } else {
+                    App.showMsg(obj.message);
+                }
+                refreshCategoryTab();
+            }
+        });
+
+    })(jQuery, window, document);
+
+    function refreshCategoryTab() {
+        $('#categoryTab').datagrid('reload');
+    }
+
+    /**
+     * 删除分类信息
+     *
+     * @param id
+     */
+    function delCategory(id) {
+        App.getRequestData('/api/common/category/delCategory', {id: id}, function(data) {
+            App.showMsg("删除分类信息成功");
+            refreshCategoryTab();
+        });
+    }
+
+    /**
+     * 修改分类信息
+     *
+     * @param id
+     */
+    function editCategory(id) {
+        $("#categoryWin").window({
+            width: "80%",
+            height: "80%",
+            modal:true
+        });
+
+        $('#categoryWin').window({title: '修改分类信息'});
+        $('#categoryForm').form({'url': App.href + '/api/common/category/updateCategory'});
+
+        App.getRequestData('/api/common/category/detail', {id: id}, function(data) {
+            $("#categoryForm").find('input[name=id]').val(data.id);
+            $("#category_catName").textbox('setValue', data.catName);
+            $("#category_catDesc").textbox('setValue', data.catDesc);
+        });
+    }
+
+    /**
+     * 新增分类信息
+     */
+    function addCategory() {
+        $("#categoryWin").window({
+            width: "80%",
+            height: "80%",
+            modal:true
+        });
+        $('#categoryForm').form({'url': App.href + '/api/common/category/saveCategory'});
+
+        $("#categoryForm").find('input[name=id]').val('');
+        $("#category_catName").textbox('setValue', '');
+        $("#category_catDesc").textbox('setValue', '');
+    }
+
+    /**
+     * 保存行业信息
+     */
+    function saveCategoryInfo() {
+        $("#categoryForm").submit();
+    }
+
+    /**
+     * 取消新增行业信息
+     */
+    function cancelCategoryInfo() {
+        $("#categoryWin").window('close');
+    }
+
+</script>
+</body>
+</html>
