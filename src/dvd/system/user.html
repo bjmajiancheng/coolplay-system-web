@@ -4,6 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <title>用户管理</title>
+    <style>
+        #systemUserWin .easyui-textbox {
+            width: 500px;
+        }
+    </style>
 </head>
 
 <body>
@@ -38,10 +43,18 @@
                 <input id="user_userName" name="userName" class="easyui-validatebox easyui-textbox" prompt="请输入账户" data-options="required:true, missingMessage:'请输入账号'" disabled="disabled">
             </div>
             <div class="form-item col-md-10">
-                <label class="label-top">角色：</label>
+                <label class="label-top">密码：</label>
+                <input id="user_password" name="password" class="easyui-validatebox easyui-textbox" prompt="请输入密码" data-options="required:true, missingMessage:'请输入密码'">
+            </div>
+            <div class="form-item col-md-10">
+                <label class="label-top" style="float:left;margin-left:32.7%;">角色：</label>
 
-                <input id="userRoleId" name="roleIds" class="easyui-combobox">
-
+                <span id="userRoleIdDev" class="col-md-5" style="float:left;text-align: left;">
+                </span>
+            </div>
+            <div class="form-item col-md-10">
+                <label class="label-top">显示名称：</label>
+                <input id="user_displayName" name="displayName" class="easyui-validatebox easyui-textbox" prompt="请输入显示名称" data-options="required:true, missingMessage:'请输入显示名称'">
             </div>
             <div class="form-item col-md-10">
                 <label class="label-top">联系电话：</label>
@@ -69,6 +82,10 @@
         <div class="form-item col-md-10">
             <label class="label-top">角色：</label>
             <label class="label-top userRoleLabel"></label>
+        </div>
+        <div class="form-item col-md-10">
+            <label class="label-top">显示名称：</label>
+            <label class="label-top displayNameLabel"></label>
         </div>
         <div class="form-item col-md-10">
             <label class="label-top">联系电话：</label>
@@ -123,7 +140,14 @@
                 }, {
                     field: 'userName',
                     title: '账号',
-                    width: 50
+                    width: 50,
+                    formatter: function(value, row, index) {
+                        if(row.isAdmin == 1) {
+                            return '<font color="red">'+ row.userName +'*</font>';
+                        } else {
+                            return row.userName;
+                        }
+                    }
                 }, {
                     field: 'contactPhone',
                     title: '手机号',
@@ -197,8 +221,14 @@
     function initUserBaseInfo() {
         // 获取公司角色信息
         App.getRequestData("/api/core/user/getCurrUserRoles", {}, function(data) {
-            data.rows.unshift({id:'0', roleName:'请选择'});
-            $("#userRoleId").combobox({
+            //var html = new Array();
+            for(var i=0; i<data.rows.length; i++) {
+                var row = data.rows[i];
+                $("#userRoleIdDev").append($('<label style="min-width:80px;"><input type="checkbox" name="roleIds" style="width:10px;" value="'+row.id+'"/>'+row.roleName+'</label>'));
+            }
+            //$("#userRoleIdDev").append($(html.join('')));
+            /*data.rows.unshift({id:'0', roleName:'请选择'});*/
+            /*$("#userRoleId").combobox({
                 valueField: 'id',
                 textField: 'roleName',
                 editable: false,
@@ -207,7 +237,7 @@
                 mode: 'local',
                 value: '0',
                 data: data.rows
-            });
+            });*/
         });
     }
 
@@ -256,8 +286,8 @@
      */
     function addSystemUser() {
         $('#systemUserWin').window({
-            width:600,
-            height:400,
+            width: '80%',
+            height: '80%',
             modal:true
         });
         $('#systemUserWin').window({title: '添加用户'});
@@ -265,7 +295,12 @@
         $("#user_userName").textbox({disabled:false});
         $("#systemUserForm").find("input[name=id]").val('');
         $("#user_userName").textbox('setValue', '');
-        $("#userRoleId").combobox('setValue', '0');
+        $("#user_password").textbox('setValue', '');
+        //$("#userRoleId").combobox('setValue', '0');
+        $("#userRoleIdDev").find("input[name=roleIds]").each(function(data){
+            $(this).prop("checked", false);
+        });
+        $("#user_displayName").textbox('setValue', '');
         $("#user_contactPhone").textbox('setValue', '');
         $("#user_enabled").combobox('setValue', '1');
 
@@ -277,8 +312,8 @@
      */
     function userDetail(userId) {
         $('#systemUserDetailWin').window({
-            width:600,
-            height:400,
+            width: '80%',
+            height: '80%',
             modal:true
         });
         $('#systemUserDetailWin').window({title: '用户详情'});
@@ -286,6 +321,7 @@
         App.getRequestData('/api/core/user/getUser', {'userId': userId}, function(data) {
             $(".userNameLabel").text(data.userName);
             $(".userRoleLabel").text(data.roleName);
+            $(".displayNameLabel").text(data.displayName);
             $(".user_contactPhoneLabele").text(data.contactPhone);
 
             var enabledStr = "禁用";
@@ -309,8 +345,8 @@
      */
     function editUser(userId) {
         $('#systemUserWin').window({
-            width:600,
-            height:400,
+            width: '80%',
+            height: '80%',
             modal:true
         });
         $('#systemUserWin').window({title: '用户修改'});
@@ -322,7 +358,18 @@
             $('#systemUserForm').form({'url': App.href + '/api/core/user/updateUser'});
 
             $("#user_userName").textbox('setValue', data.userName);
-            $("#userRoleId").combobox('setValue', data.roleIds);
+            $("#user_password").textbox('setValue', data.password);
+            $("#userRoleIdDev").find("input[name=roleIds]").each(function(data){
+                $(this).prop("checked", false);
+            });
+
+            for(var i=0; i<data.roleIds.length; i++) {
+                $("#userRoleIdDev").find("input[name=roleIds][value="+data.roleIds[i]+"]").each(function(data){
+                    $(this).prop("checked", true);
+                });
+            }
+            $("#user_displayName").textbox('setValue', data.displayName);
+            //$("#userRoleId").combobox('setValue', data.roleIds);
             $("#user_contactPhone").textbox('setValue', data.contactPhone);
             $("#user_enabled").combobox('setValue', data.enabled);
         });
