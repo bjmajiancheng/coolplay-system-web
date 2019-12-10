@@ -33,7 +33,7 @@
         <form id="companyDetailForm" method="post">
             <input type="hidden" name="id" />
             <input type="hidden" name="status" />
-            <div class="form-item col-md-5">
+            <!--<div class="form-item col-md-5">
                 <label class="label-top">公司名称：</label>
                 <input id="companyDetail_companyName" name="companyName" class="easyui-validatebox easyui-textbox" prompt="请输入公司名称" data-options="required:true, missingMessage:'请输入公司名称'">
             </div>
@@ -96,12 +96,128 @@
             <div class="form-item col-md-5">
                 <label class="label-top">后台密码：</label>
                 <input id="companyDetail_adminPassword" name="adminPassword" class="easyui-textbox" prompt="请输入后台密码">
-            </div>
+            </div>-->
 
             <!--<div class="form-item col-md-10">
                 <label class="label-top">原因：</label>
                 <input id="companyDetail_rejectReason" name="rejectReason" class="easyui-textbox" prompt="请输入原因">
             </div>-->
+
+            <div class="form-item col-md-10">
+                <label class="label-top">公司全称：</label>
+                <input id="companyDetail_companyFullName" name="companyFullName" class="easyui-validatebox easyui-textbox" prompt="请输入公司全称" data-options="required:true, missingMessage:'请输入公司全称'" style="width:80%;">
+            </div>
+
+            <div class="form-item col-md-10">
+                <label class="label-top">公司简称：</label>
+                <input id="companyDetail_companyName" name="companyName" class="easyui-validatebox easyui-textbox" prompt="请输入公司简称" data-options="required:true, missingMessage:'请输入公司简称'" style="width:80%;">
+            </div>
+
+            <div class="form-item col-md-10">
+                <label class="label-top">所属行业：</label>
+
+                <span id="industryIdSpan">
+
+            </span>
+            </div>
+
+            <div class="form-item col-md-10" style="height:300px;">
+                <label class="label-top">公司简介：</label>
+
+                <input type="hidden" name="companyDesc"/>
+
+                <div class="easyui-texteditor" id="companyDetail_companyDescDiv" title="公司简介" style="width:90%;height:300px;padding:20px;left:126px;top:0px;">
+
+                </div>
+            </div>
+
+            <div class="form-item col-md-10" style="height:300px;">
+                <label class="label-top" style="float:left;">地图标点：</label>
+
+
+                <div id="companyPosMap" class="map" tabindex="0" style="width: 80%; height: 100%; float:left; font-size: 13px;"></div>
+
+                <div id="pickerBox" style="position: absolute; z-index: 9999999; top: 20px; left: 150px; width: 300px;">
+                    <input id="pickerInput" style="width: 200px; padding: 5px 5px;" placeholder="输入关键字选取地点" />
+                    <div id="poiInfo" style="background: #fff;"></div>
+                </div>
+
+                <input type="hidden" name="posX" />
+                <input type="hidden" name="posY" />
+            </div>
+
+            <div class="form-item col-md-10">
+                <label class="label-top">GPS坐标：</label>
+
+                <input id="companyDetail_gps" name="gps" class="easyui-validatebox easyui-textbox" prompt="请输入GPS坐标" data-options="required:true, missingMessage:'请输入GPS坐标'" style="width:80%;">
+            </div>
+
+            <div class="form-item col-md-10">
+                <label class="label-top">公司地址：</label>
+                <input id="companyDetail_contactAddress" name="contactAddress" class="easyui-validatebox easyui-textbox" prompt="请输入公司地址" data-options="required:true, missingMessage:'请输入公司地址'" style="width:80%;">
+            </div>
+
+            <div class="form-item col-md-10">
+                <label class="label-top">主营项目：</label>
+                <input id="companyDetail_majorProject" name="majorProject" class="easyui-validatebox easyui-textbox" prompt="请输入主营项目" data-options="required:true, missingMessage:'请输入主营项目'" style="width:80%;">
+            </div>
+
+            <div class="form-item col-md-10">
+                <label class="label-top" style="float:left;">营业执照附件：</label>
+                <div id="businessLicenseUrlDiv" style="float:left;">
+                </div>
+            </div>
+
+            <div class="form-item col-md-10">
+                <label class="label-top" style="float:left;">背景图片：</label>
+                <div id="backgroudImgDiv" style="float:left;">
+                </div>
+            </div>
+
+            <div class="form-item col-md-10">
+                <label class="label-top" style="float:left;">身份证正反面照片：</label>
+                <div id="idcardPositivePhotoDiv" style="float:left;">
+                </div>
+
+                <div id="idcardNegativePhotoDiv" style="float:left;margin-left:10px;">
+                </div>
+            </div>
+
+            <div class="form-item col-md-10">
+                <label class="label-top">法人姓名：</label>
+                <input id="companyDetail_legalName" name="legalName" class="easyui-validatebox easyui-textbox" prompt="请输入法人姓名" data-options="required:true, missingMessage:'请输入法人姓名'" style="width:80%;">
+            </div>
+
+            <div class="form-item col-md-10">
+                <label class="label-top">法人身份证号码：</label>
+                <input id="companyDetail_legalIdcard" name="legalIdcard" class="easyui-validatebox easyui-textbox" prompt="请输入法人身份证号码" data-options="required:true, missingMessage:'请输入法人身份证号码', validType:'idcard'" style="width:80%;">
+            </div>
+
+            <div class="form-item col-md-10">
+                <label class="label-top">联系人：</label>
+                <input id="companyDetail_contactName" name="contactName" class="easyui-validatebox easyui-textbox" prompt="请输入联系人" data-options="required:true, missingMessage:'请输入联系人'" style="width:80%;">
+            </div>
+
+            <div class="form-item col-md-10">
+                <label class="label-top">电话：</label>
+                <input id="companyDetail_contactMobile" name="contactMobile" class="easyui-validatebox easyui-textbox" prompt="请输入电话" data-options="required:true, missingMessage:'请输入电话', validType:'telephone'" style="width:80%;">
+            </div>
+
+            <div class="form-item col-md-10">
+                <label class="label-top">邮箱：</label>
+                <input id="companyDetail_companyEmail" name="companyEmail" class="easyui-validatebox easyui-textbox" prompt="请输入邮箱" data-options="required:true, missingMessage:'请输入邮箱', validType:'email'" style="width:80%;">
+            </div>
+
+            <div class="form-item col-md-10">
+                <label class="label-top">后台账号：</label>
+                <input id="companyDetail_adminUserName" name="adminUserName" class="easyui-validatebox easyui-textbox" prompt="请输入后台账号" data-options="required:true, missingMessage:'请输入后台账号'" style="width:80%;">
+            </div>
+
+            <div class="form-item col-md-10">
+                <label class="label-top">后台密码：</label>
+                <input id="companyDetail_adminPassword" name="adminPassword" class="easyui-validatebox easyui-textbox" prompt="请输入后台密码" data-options="required:true, missingMessage:'请输入后台密码'" style="width:80%;">
+            </div>
+
             <input type="hidden" name="rejectReason" />
             <div class="clear"></div>
 
@@ -241,6 +357,115 @@
             }
         });
 
+
+        var markers = [];
+
+        //渲染基地地图
+        var map = new AMap.Map('companyPosMap', {
+            zoom: 10
+        });
+
+        window.map = map;
+        window.markers = markers;
+
+        var geocoder = new AMap.Geocoder({
+            city: "010", //城市设为北京，默认：“全国”
+            radius: 1000 //范围，默认：500
+        });
+
+        AMapUI.loadUI(['control/BasicControl'], function(BasicControl) {
+
+            //缩放控件，显示Zoom值
+            map.addControl(new BasicControl.Zoom({
+                position: 'lb',
+                showZoomNum: true
+            }));
+
+            //图层切换控件
+            map.addControl(new BasicControl.LayerSwitcher({
+                position: 'rt'
+            }));
+        });
+
+        AMapUI.loadUI(['misc/PoiPicker'], function(PoiPicker) {
+
+            var poiPicker = new PoiPicker({
+                //city:'北京',
+                input: 'pickerInput'
+            });
+
+            //初始化poiPicker
+            poiPickerReady(poiPicker);
+        });
+
+        map.on('click', function(e){
+            if(markers.length > 0) {
+                map.remove(markers);
+            }
+
+            var marker = new AMap.Marker({
+                map:map,
+                position:[e.lnglat.getLng(), e.lnglat.getLat()],
+                label: {
+                    offset: new AMap.Pixel(20, 20),//修改label相对于maker的位置
+                }
+            });
+
+            //定位设置坐标
+            $("#companyDetailForm").find("input[name=posX]").val(e.lnglat.getLng());
+            $("#companyDetailForm").find("input[name=posY]").val(e.lnglat.getLat());
+            $("#companyDetail_gps").textbox('setValue', e.lnglat.getLng() + "," + e.lnglat.getLat());
+
+            geocoder.getAddress(e.lnglat.getLng() + "," + e.lnglat.getLat(), function(status, result) {
+                if (status === 'complete' && result.regeocode) {
+                    var address = result.regeocode.formattedAddress;
+                    $("#companyDetail_contactAddress").textbox('setValue', address);
+
+                }else{
+                    console.log('根据经纬度查询地址失败');
+                }
+            });
+
+            markers.push(marker);
+        });
+
+        function poiPickerReady(poiPicker) {
+
+            window.poiPicker = poiPicker;
+
+
+            //选取了某个POI
+            poiPicker.on('poiPicked', function(poiResult) {
+                poi = poiResult.item;
+
+                var marker = new AMap.Marker();
+                marker.setMap(map);
+
+                marker.setPosition(poi.location);
+                map.setCenter(marker.getPosition());
+
+                $("#companyDetailForm").find("input[name=posX]").val(poi.location.lng);
+                $("#companyDetailForm").find("input[name=posY]").val(poi.location.lat);
+
+                $("#companyDetail_gps").textbox('setValue', poi.location.lng + "," + poi.location.lat);
+
+                geocoder.getAddress(poi.location.lng + "," + poi.location.lat, function(status, result) {
+                    if (status === 'complete' && result.regeocode) {
+                        var address = result.regeocode.formattedAddress;
+                        $("#companyDetail_contactAddress").textbox('setValue', address);
+                    }else{
+                        console.log('根据经纬度查询地址失败');
+                    }
+                });
+
+                if(markers.length > 0) {
+                    map.remove(markers);
+                }
+
+                markers.push(marker);
+            });
+        }
+
     })(jQuery, window, document);
 
 
@@ -253,7 +478,9 @@
 
         App.getRequestData('/api/system/company/companyInfo', {'id': id}, function(data) {
             $("#companyDetailForm").find("input[name=id]").val(data.id);
-            $("#companyDetail_companyName").textbox('setValue', data.companyName);
+            $("#companyDetailForm").find("input[name=status]").val(data.status);
+
+            /*$("#companyDetail_companyName").textbox('setValue', data.companyName);
             $("#companyDetail_contactName").textbox('setValue', data.contactName);
             $("#companyDetail_contactMobile").textbox('setValue', data.contactMobile);
             $("#companyDetail_contactAddress").textbox('setValue', data.contactAddress);
@@ -271,7 +498,62 @@
 
             App.showImage("businessLicenseUrlDiv", data.businessLicenseUrl);
             App.showImage("idcardPositivePhotoDiv", data.idcardPositivePhoto);
+            App.showImage("idcardNegativePhotoDiv", data.idcardNegativePhoto);*/
+
+            $("#companyDetailForm").find("input[name=id]").val(data.id);
+            $("#companyDetail_companyFullName").textbox('setValue', data.companyFullName);
+            $("#companyDetail_companyName").textbox('setValue', data.companyName);
+            $("#companyDetail_companyDescDiv").texteditor('setValue', data.companyDesc);
+
+            $("input[name=posX]").val(data.posX);
+            $("input[name=posY]").val(data.posY);
+            $("#companyDetail_gps").textbox('setValue', data.posX + "," + data.posY);
+
+            if(data.posX != 0 && data.posY != 0) {
+                var marker = new AMap.Marker({
+                    map:map,
+                    position:[data.posX, data.posY],
+                    label: {
+                        offset: new AMap.Pixel(20, 20),//修改label相对于maker的位置
+                    }
+                });
+                map.setCenter(marker.getPosition());
+                markers.push(marker);
+            }
+
+            $("#companyDetail_majorProject").textbox('setValue', data.majorProject);
+            $("#companyDetail_contactAddress").textbox('setValue', data.contactAddress);
+
+            $("#companyDetail_legalName").textbox('setValue', data.legalName);
+            $("#companyDetail_legalIdcard").textbox('setValue', data.legalIdcard);
+            $("#companyDetail_contactName").textbox('setValue', data.contactName);
+            $("#companyDetail_contactMobile").textbox('setValue', data.contactMobile);
+            $("#companyDetail_companyEmail").textbox('setValue', data.companyEmail);
+            $("#companyDetail_adminUserName").textbox('setValue', data.adminUserName);
+            $("#companyDetail_adminPassword").textbox('setValue', data.adminPassword);
+
+            $("#businessLicenseUrl").attr('value', data.businessLicenseUrl);
+            $("#idcardPositivePhoto").attr('value', data.idcardPositivePhoto);
+            $("#idcardNegativePhoto").attr('value', data.idcardNegativePhoto);
+
+            App.showImage("businessLicenseUrlDiv", data.businessLicenseUrl);
+            App.showImage("idcardPositivePhotoDiv", data.idcardPositivePhoto);
             App.showImage("idcardNegativePhotoDiv", data.idcardNegativePhoto);
+            App.showImage("backgroudImgDiv", data.backgroudImg);
+
+            $("#industryIdSpan").html('');
+            var industryIds = data.industryIds;
+            //所属行业信息初始化
+            App.getRequestData('/api/noneAuth/industryOptions', {}, function(result) {
+                for(var i = 0; i < result.length; i++) {
+                    var row = result[i];
+                    if(industryIds.indexOf(row.value) >= 0) {
+                        $("#industryIdSpan").append($('<label style="min-width:80px;"><input type="checkbox" name="industryIds" style="width:10px;" value="'+row.value+'" checked="checked"/>&nbsp;&nbsp;'+row.text+'</label>'));
+                    } else {
+                        $("#industryIdSpan").append($('<label style="min-width:80px;"><input type="checkbox" name="industryIds" style="width:10px;" value="'+row.value+'"/>&nbsp;&nbsp;'+row.text+'</label>'));
+                    }
+                }
+            });
 
             if(data.reviewStatus == 1) {
                 $(".control_btn").hide();
@@ -284,6 +566,7 @@
         $('#idcardPositivePhotoDiv').html('');
         $('#idcardNegativePhotoDiv').html('');
         $('#businessLicenseUrlDiv').html('');
+        $('#backgroudImgDiv').html('');
 
         var positiveEle = App.uploadImage({id: "idcardPositivePhoto", name: 'idcardPositivePhoto', isAjaxUpload: true, autoUpload: true});
         $('#idcardPositivePhotoDiv').append(positiveEle);
@@ -293,6 +576,9 @@
 
         var businessLicenseUrlEle = App.uploadImage({id:"businessLicenseUrl", name: 'businessLicenseUrl', isAjaxUpload: true, autoUpload: true});
         $('#businessLicenseUrlDiv').append(businessLicenseUrlEle);
+
+        var backgroudImgEle = App.uploadImage({id:"backgroudImg", name: 'backgroudImg', isAjaxUpload: true, autoUpload: true});
+        $('#backgroudImgDiv').append(backgroudImgEle);
     }
 
     /**
