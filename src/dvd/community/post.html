@@ -108,13 +108,14 @@
 
     <div id="topPostWin" style="display: none;padding:5px;" title="圈内置顶">
         <div class="form-item col-md-10">
+            <input type="hidden" name="topPostId" />
             <label class="label-top" style="float:left;margin-left:32.7%;">圈子：</label>
 
             <span id="circleIdDev" class="col-md-5" style="float:left;text-align: left;">
             </span>
         </div>
 
-        <div class="form-item col-md-10">
+        <div class="form-item col-md-10" style="margin-left:250px;">
             <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="topPostSave()">置顶</a>
             <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="topPostCancel()">取消</a>
         </div>
@@ -212,7 +213,7 @@
                         btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showPost('+ row.id +')">查看</a>&nbsp;');
 
                         if(row.isTop == 1) {
-                            btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="canalTopPost('+ row.id +')">取消置顶</a>&nbsp;');
+                            btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="topPost('+ row.id +')">取消置顶</a>&nbsp;');
                         } else {
                             btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="topPost('+ row.id +')">圈内置顶</a>&nbsp;');
                         }
@@ -341,13 +342,35 @@
     /**
      * 取消置顶帖子
      */
-    function canalTopPost(id) {
-        App.getRequestData('/api/community/post/updateIsTop', {id: id, isTop: 0}, function(data) {
+    /*function canalTopPost(id) {
+        $('#topPostWin').window({
+            width:'60%',
+            height:'60%',
+            modal:true
+        });
+
+        $("input[name=topPostId]").val(id);
+        $("#circleIdDev").html('');
+        //获取所有关联圈子
+        App.getRequestData('/api/community/post/circleList', {postId: id}, function(data) {
+            for(var i=0; i<data.circlePosts.length; i++) {
+                var row = data.circlePosts[i];
+                var checked = "";
+                if(row["isTop"] == 1) {
+                    checked = " checked = 'checked' "
+                }
+                $("#circleIdDev").append($('<label style="min-width:80px;"><input type="checkbox" name="circleIds" style="width:10px;" value="'+row.circleId+'" '+ checked +'/>&nbsp;'+row.circleName+'</label>'));
+            }
+        });
+
+
+
+        /!*App.getRequestData('/api/community/post/updateIsTop', {id: id, isTop: 0}, function(data) {
             App.showMsg("取消置顶帖子成功");
 
             refreshPost();
-        });
-    }
+        });*!/
+    }*/
 
     /**
      * 置顶帖子
@@ -359,6 +382,7 @@
             modal:true
         });
 
+        $("input[name=topPostId]").val(id);
         $("#circleIdDev").html('');
         //获取所有关联圈子
         App.getRequestData('/api/community/post/circleList', {postId: id}, function(data) {
@@ -368,7 +392,7 @@
                 if(row["isTop"] == 1) {
                     checked = " checked = 'checked' "
                 }
-                $("#circleIdDev").append($('<label style="min-width:80px;"><input type="checkbox" name="circleIds" style="width:10px;" value="'+row.circleId+'" '+ checked +'/>'+row.circleName+'</label>'));
+                $("#circleIdDev").append($('<label style="min-width:80px;"><input type="checkbox" name="circleIds" style="width:10px;" value="'+row.circleId+'" '+ checked +'/>&nbsp;'+row.circleName+'</label>'));
             }
         });
     }
@@ -377,8 +401,15 @@
      * 圈内置顶操作
      */
     function topPostSave() {
-        App.getRequestData('/api/community/post/updateIsTop', {id: id, isTop: 1}, function(data) {
-            App.showMsg("置顶帖子成功");
+        var circleIds = [];
+        $("input[name=circleIds]").each(function(){
+            if($(this).prop('checked')) {
+                circleIds.append($(this).val());
+            }
+        });
+
+        App.getRequestData('/api/community/post/updateIsTop', {id: $("input[name=topPostId]").val(), isTop: 1, circleIds: circleIds}, function(data) {
+            App.showMsg("操作成功");
 
             refreshPost();
         });
