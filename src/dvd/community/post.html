@@ -408,7 +408,7 @@
             }
         });
 
-        App.postRequestData('/api/community/post/updateIsTop', {'postId': $("input[name=topPostId]").val(), 'isTop': 1, 'circleIds': circleIds}, function(data) {
+        App.postRequestData('/api/community/post/updateIsTop', JSON.stringify({'postId': $("input[name=topPostId]").val(), 'isTop': 1, 'circleIds': circleIds}), function(data) {
             App.showMsg("操作成功");
 
             refreshPost();
