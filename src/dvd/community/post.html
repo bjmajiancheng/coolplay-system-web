@@ -212,11 +212,11 @@
                         var btns = new Array();
                         btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showPost('+ row.id +')">查看</a>&nbsp;');
 
-                        if(row.isTop == 1) {
+                        /*if(row.isTop == 1) {
                             btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="topPost('+ row.id +')">取消置顶</a>&nbsp;');
-                        } else {
+                        } else {*/
                             btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="topPost('+ row.id +')">圈内置顶</a>&nbsp;');
-                        }
+                        /*}*/
 
                         btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showPostCommentList(' + row.id + ')">评论列表</a>&nbsp;');
                         btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="delPost(' + row.id + ')">删除</a>');
@@ -408,7 +408,7 @@
             }
         });
 
-        App.postRequestData('/api/community/post/updateIsTop', {'id': $("input[name=topPostId]").val(), 'isTop': 1, 'circleIds': circleIds}, function(data) {
+        App.postRequestData('/api/community/post/updateIsTop', {'postId': $("input[name=topPostId]").val(), 'isTop': 1, 'circleIds': circleIds}, function(data) {
             App.showMsg("操作成功");
 
             refreshPost();
