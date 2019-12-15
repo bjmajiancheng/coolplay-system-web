@@ -404,7 +404,7 @@
         var circleIds = [];
         $("input[name=circleIds]").each(function(){
             if($(this).prop('checked')) {
-                circleIds.append($(this).val());
+                circleIds.push($(this).val());
             }
         });
 
