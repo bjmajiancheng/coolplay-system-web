@@ -206,7 +206,7 @@
         if (subMenus.length > 0) {
             $.each(subMenus, function (i, m) {
                 var originAction = App.page.urls.mapping[m.action];
-                eles.push("<li data-url='"+ originAction +"' onclick='App.menu.showPageInfo($(this));'>" + m.functionName + "</li>");
+                eles.push("<li data-url='"+ originAction +"' onclick='App.menu.showPageInfo($(this));'  style='padding-left:40px;'>" + m.functionName + "</li>");
             });
         }
         return eles.join('');

@@ -165,6 +165,7 @@
                     formatter: function(value, row, index) {
                         var btns = new Array();
                         btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="delLabel(' + row.id + ')">删除</a>&nbsp;');
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="editLabel(' + row.id + ')">编辑</a>&nbsp;');
                         btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showLabel(' + row.id + ')">查看</a>');
                         return btns.join('');
                     }
@@ -192,6 +193,19 @@
             }
         });
 
+        App.getRequestData("/api/common/category/options", {}, function(data) {
+            data.rows.unshift({id:'', catName:'请选择'});
+            $("#labelDetail_catId").combobox({
+                valueField: 'id',
+                textField: 'catName',
+                editable: false,
+                required: true,
+                mode: 'local',
+                value: '',
+                data: data.rows
+            });
+        });
+
     })(jQuery, window, document);
 
 
@@ -209,19 +223,12 @@
             modal:true
         });
 
-        App.getRequestData("/api/common/category/options", {}, function(data) {
-            data.rows.unshift({id:'', catName:'请选择'});
-            $("#labelDetail_catId").combobox({
-                valueField: 'id',
-                textField: 'catName',
-                editable: false,
-                required: true,
-                mode: 'local',
-                value: '',
-                data: data.rows
-            });
-        });
         $("#labelDetail_labelName").textbox('setValue', '');
+        $("#labelDetail_catId").combobox('setValue', '');
+        $("#label_status").combobox('setValue', '0');
+
+        $('#labelWin').window({title: '添加标签信息'});
+        $('#labelForm').form({'url': App.href + '/api/community/label/saveLabel'});
     }
 
     /**
@@ -233,6 +240,27 @@
         App.getRequestData('/api/community/label/delLabel', {'id': id}, function(data){
             App.showMsg("删除标签成功");
             refreshLabelTab();
+        });
+    }
+
+    /**
+     * 编辑标签
+     */
+    function editLabel(id) {
+        $("#labelWin").window({
+            width: "80%",
+            height: "80%",
+            modal:true
+        });
+
+        $('#labelWin').window({title: '修改标签信息'});
+        $('#labelForm').form({'url': App.href + '/api/community/label/updateLabel'});
+
+        App.getRequestData('/api/community/label/getLabel', {id: id}, function(data) {
+
+            $("#labelDetail_labelName").textbox('setValue', data.labelName);
+            $("#labelDetail_catId").combobox('setValue', data.catId);
+            $("#label_status").combobox('setValue', data.status);
         });
     }
 
