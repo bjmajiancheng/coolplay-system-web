@@ -72,7 +72,8 @@
             success: function (result) {
                 if (result.code === 200) {
                     $.cookie('coolplay_system_token', result.token, {expires: 7});
-                    $.fn.cookie('coolplay_system_token', 'result.token', { expires: 7 });
+                    /*$.fn.cookie('coolplay_system_token', result.token, { expires: 7 });*/
+                    setCookie('coolplay_system_token', result.token);
 
                     window.location.href = App.href + "/index.html";
                 } else {
@@ -89,4 +90,11 @@
             window.location.href = App.href + "/forgetPass.html";
         });
     });
+
+    function setCookie(name, value) {
+        var date = new Date();
+        var expires = 7;
+        date.setTime(date.getTime() + expires * 24 * 60 * 60 * 1000)
+        document.cookie = name + "=" + value + ";expires=" + date.toGMTString() + ";path=" + "/";
+    }
 })(jQuery, window, document);
