@@ -72,6 +72,8 @@
             success: function (result) {
                 if (result.code === 200) {
                     $.cookie('coolplay_system_token', result.token, {expires: 7});
+                    $.fn.cookie('coolplay_system_token', 'result.token', { expires: 7 });
+
                     window.location.href = App.href + "/index.html";
                 } else {
                     alertValidate(result.message);
