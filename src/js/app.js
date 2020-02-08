@@ -8,10 +8,6 @@
         requestMapping: {}
     };
 
-    alert('index:' + $.cookie('coolplay_system_token'));
-    console.log('index:' + $.cookie('coolplay_system_token'));
-    debugger;
-
     /**
      * 下载文件
      * @param href
