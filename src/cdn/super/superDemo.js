@@ -87,4 +87,16 @@ $(function() {
 			}
 		});
 	});
+
+
+	//修改密码
+	$("#updatePass").on('click', function() {
+        $("#updatePassWin").window({
+            width: "80%",
+            height: "80%",
+            modal:true
+        });
+
+
+	});
 });
