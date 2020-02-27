@@ -67,6 +67,27 @@
     </div>
 </div>
 
+<div id="reviewCircleWin" style="display: none;padding:5px;" title="圈子审核">
+    <div>
+        <!--<label class="label-top">请输入不通过理由：</label>
+        <textarea id="rejectReason" rows="8" cols="60"></textarea>-->
+
+        <input id="id" type="hidden" />
+        <input id="status" type="hidden" />
+
+        <div class="search-form-item col-md-10">
+            <label class="label-top">请输入不通过理由：</label>
+
+            <textarea id="rejectReason" rows="8" cols="60"></textarea>
+        </div>
+
+        <div class="form-item col-md-10">
+            <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="reviewCircleSave()">保存</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="reviewCircleCancel()">取消</a>
+        </div>
+    </div>
+</div>
+
 
 
 <script type="text/javascript">
@@ -171,6 +192,24 @@
     }
 
     /**
+     * 审核圈子保存
+     **/
+    function reviewCircleSave() {
+        App.getRequestData('/api/community/circle/reviewCircle', {id: $("#id").val(), status: $("#status").val(), rejectReason: $("#rejectReason").val()}, function(data) {
+            App.showMsg("审核不通过操作成功.");
+            refreshCircleTab();
+            $('#reviewCircleWin').window('close');
+        });
+    }
+
+    /**
+     * 审核圈子取消
+     **/
+    function reviewCircleCancel() {
+        $('#reviewCircleWin').window('close');
+    }
+
+    /**
      * 审核圈子
      *
      * @param id
@@ -179,12 +218,20 @@
     function reviewCircle(id, status) {
         var rejectReason = "";
         if(status == 2) {
-            App.prompt('请输入不通过理由', function(data) {
+            $("#reviewCircleWin").window({
+                width: "80%",
+                height: "80%",
+                modal:true
+            });
+            $("#id").val(id);
+            $("#status").val(status);
+
+            /*App.prompt('请输入不通过理由', function(data) {
                 App.getRequestData('/api/community/circle/reviewCircle', {id: id, status: status, rejectReason: data}, function(data) {
                     App.showMsg("审核不通过操作成功.");
                     refreshCircleTab();
                 });
-            });
+            });*/
         } else if(status == 1) {
             App.getRequestData('/api/community/circle/reviewCircle', {id: id, status: status, rejectReason:''}, function(data) {
                 App.showMsg("审核通过操作成功.");
