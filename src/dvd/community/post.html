@@ -106,7 +106,7 @@
         </div>
     </div>
 
-    <div id="topPostWin" style="display: none;padding:5px;" title="圈内置顶">
+    <div id="topPostWin" style="display: none;padding:5px;" title="置顶">
         <div class="form-item col-md-10">
             <input type="hidden" name="topPostId" />
             <label class="label-top" style="float:left;margin-left:32.7%;">圈子：</label>
@@ -215,7 +215,7 @@
                         /*if(row.isTop == 1) {
                             btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="topPost('+ row.id +')">取消置顶</a>&nbsp;');
                         } else {*/
-                            btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="topPost('+ row.id +')">圈内置顶</a>&nbsp;');
+                            btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="topPostSave('+ row.id +')">置顶</a>&nbsp;');
                         /*}*/
 
                         btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showPostCommentList(' + row.id + ')">评论列表</a>&nbsp;');
@@ -375,7 +375,7 @@
     /**
      * 置顶帖子
      */
-    function topPost(id) {
+    /*function topPost(id) {
         $('#topPostWin').window({
             width:'60%',
             height:'60%',
@@ -395,13 +395,13 @@
                 $("#circleIdDev").append($('<label style="min-width:80px;"><input type="checkbox" name="circleIds" style="width:10px;" value="'+row.circleId+'" '+ checked +'/>&nbsp;'+row.circleName+'</label>'));
             }
         });
-    }
+    }*/
 
     /**
-     * 圈内置顶操作
+     * 置顶操作
      */
-    function topPostSave() {
-        var circleIds = [];
+    function topPostSave(postId) {
+        /*var circleIds = [];
         $("input[name=circleIds]").each(function(){
             if($(this).prop('checked')) {
                 circleIds.push($(this).val());
@@ -409,6 +409,12 @@
         });
 
         App.postRequestData('/api/community/post/updateIsTop', JSON.stringify({'postId': $("input[name=topPostId]").val(), 'isTop': 1, 'circleIds': circleIds}), function(data) {
+            App.showMsg("操作成功");
+
+            refreshPost();
+        });*/
+
+        App.postRequestData('/api/community/post/topPost', JSON.stringify({'id': postId, 'isTop': 1}), function(data) {
             App.showMsg("操作成功");
 
             refreshPost();
