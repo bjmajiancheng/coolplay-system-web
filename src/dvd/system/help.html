@@ -46,6 +46,19 @@
     </div>
 </div>
 
+<div id="helpWin" style="display: none;padding:5px;" title="新增帮助标题">
+    <div class="form-item col-md-10">
+        <label class="label-top">帮助标题名称：</label>
+
+        <input id="helpName" name="helpName" class="easyui-textbox" prompt="请输入帮助标题名称" style="width:80%"/>
+    </div>
+
+    <div class="form-item col-md-10" style="margin-left:250px;">
+        <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="helpSave()">新增</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="helpCancel()">取消</a>
+    </div>
+</div>
+
 
 <script type="text/javascript">
     ;(function ($, window, document, undefined){
@@ -155,23 +168,48 @@
         });
     })(jQuery, window, document);
 
+    var parentTreeNode = null;
+
+
     /**
      * 添加节点
      * @param parentTreeNode
      */
     function addTreeNode(parentTreeNode) {
-        App.prompt('新增帮助标题：', function(data) {
-            var parentId = 0;
-            if(parentTreeNode) {
-                parentId = parentTreeNode.id;
-            }
-            App.getRequestData('/api/common/help/saveHelp', {parentId: parentId, helpTitle: data}, function(data) {
-                App.showMsg('添加成功');
-
-                var zTree = $.fn.zTree.getZTreeObj("treeDemo");
-                zTree.addNodes(parentTreeNode, {id: data.id, pId: parentId, name: data.helpTitle});
-            });
+        $('#helpWin').window({
+            width: '60%',
+            height: '30%',
+            modal:true
         });
+
+        /*App.prompt('帮助标题名称：', function(data) {
+
+        });*/
+    }
+
+    /**
+     * 帮助标题保存
+     */
+    function helpSave() {
+        var parentId = 0;
+        if(parentTreeNode) {
+            parentId = parentTreeNode.id;
+        }
+        App.getRequestData('/api/common/help/saveHelp', {parentId: parentId, helpTitle: $("#helpName").textbox('getValue')}, function(data) {
+            App.showMsg('添加成功');
+
+            var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+            zTree.addNodes(parentTreeNode, {id: data.id, pId: parentId, name: data.helpTitle});
+
+            $('#helpWin').window('close');
+        });
+    }
+
+    /**
+     * 帮助标题取消保存
+     */
+    function helpCancel() {
+        $('#helpWin').window('close');
     }
 
     /**

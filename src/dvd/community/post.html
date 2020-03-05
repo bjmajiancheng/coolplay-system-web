@@ -212,11 +212,11 @@
                         var btns = new Array();
                         btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showPost('+ row.id +')">查看</a>&nbsp;');
 
-                        /*if(row.isTop == 1) {
-                            btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="topPost('+ row.id +')">取消置顶</a>&nbsp;');
-                        } else {*/
-                            btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="topPostSave('+ row.id +')">置顶</a>&nbsp;');
-                        /*}*/
+                        if(row.isTop == 1) {
+                            btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="topPostSave('+ row.id +', 0)">取消置顶</a>&nbsp;');
+                        } else {
+                            btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="topPostSave('+ row.id +', 1)">置顶</a>&nbsp;');
+                        }
 
                         btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="showPostCommentList(' + row.id + ')">评论列表</a>&nbsp;');
                         btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="delPost(' + row.id + ')">删除</a>');
@@ -400,7 +400,7 @@
     /**
      * 置顶操作
      */
-    function topPostSave(postId) {
+    function topPostSave(postId, isTop) {
         /*var circleIds = [];
         $("input[name=circleIds]").each(function(){
             if($(this).prop('checked')) {
@@ -414,7 +414,7 @@
             refreshPost();
         });*/
 
-        App.postRequestData('/api/community/post/topPost', JSON.stringify({'id': postId, 'isTop': 1}), function(data) {
+        App.postRequestData('/api/community/post/topPost', JSON.stringify({'id': postId, 'isTop': isTop}), function(data) {
             App.showMsg("操作成功");
 
             refreshPost();
