@@ -69,9 +69,6 @@
 
 <div id="reviewCircleWin" style="display: none;padding:5px;" title="圈子审核">
     <div>
-        <!--<label class="label-top">请输入不通过理由：</label>
-        <textarea id="rejectReason" rows="8" cols="60"></textarea>-->
-
         <input id="id" type="hidden" />
         <input id="status" type="hidden" />
 
@@ -81,7 +78,7 @@
             <textarea id="rejectReason" rows="8" cols="60"></textarea>
         </div>
 
-        <div class="form-item col-md-10">
+        <div class="form-item col-md-10" style="margin-left:30%;">
             <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="reviewCircleSave()">保存</a>
             <a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="reviewCircleCancel()">取消</a>
         </div>
@@ -219,8 +216,8 @@
         var rejectReason = "";
         if(status == 2) {
             $("#reviewCircleWin").window({
-                width: "80%",
-                height: "80%",
+                width: "40%",
+                height: "40%",
                 modal:true
             });
             $("#id").val(id);

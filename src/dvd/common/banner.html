@@ -25,7 +25,7 @@
 
     <div id="bannerWin" style="display: none;padding-top:30px;padding-left:100px;" title="新增banner">
         <form id="bannerForm" method="post">
-            <!--<input name="id" type="hidden" />-->
+            <input name="id" type="hidden" />
             <div class="form-item col-md-10">
                 <label class="label-top">标题：</label>
                 <input id="banner_bannerTitle" class="easyui-validatebox easyui-textbox" prompt="请输入标题" name="bannerTitle" data-options="required:true, missingMessage:'请输入标题'">
@@ -117,6 +117,7 @@
                     align: 'center',
                     formatter: function(value, row, index) {
                         var btns = new Array();
+                        btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="updateBanner(' + row.id + ')">修改</a>&nbsp;&nbsp;&nbsp;&nbsp;');
                         btns.push('<a href="javascript:void(0)" class="easyui-linkbutton primary" onclick="delBanner(' + row.id + ')">删除</a>');
                         return btns.join('');
                     }
@@ -141,6 +142,10 @@
                 refreshBannerTab();
             }
         });
+
+        $('#bannerImgDiv').html('');
+        var bannerImgEle = App.uploadImage({id: "bannerImg", name: 'bannerImg', isAjaxUpload: true, autoUpload: true});
+        $('#bannerImgDiv').append(bannerImgEle);
 
     })(jQuery, window, document);
 
@@ -169,15 +174,42 @@
             height: "80%",
             modal:true
         });
+        $('#bannerWin').window({title: '新增Banner'});
+        $('#bannerForm').form({'url': App.href + '/api/common/banner/saveBanner'});
 
-        $('#bannerImgDiv').html('');
+        $("#bannerForm").find("input[name=id]").val('');
+        /*$('#bannerImgDiv').html('');
 
         var bannerImgEle = App.uploadImage({id: "bannerImg", name: 'bannerImg', isAjaxUpload: true, autoUpload: true});
-        $('#bannerImgDiv').append(bannerImgEle);
+        $('#bannerImgDiv').append(bannerImgEle);*/
 
         $("#banner_bannerTitle").textbox('setValue', '');
         $("#banner_bannerUrl").textbox('setValue', '');
         $("#banner_sort").textbox('setValue', '');
+    }
+
+    function updateBanner(id) {
+        $("#bannerWin").window({
+            width: "80%",
+            height: "80%",
+            modal:true
+        });
+        $('#bannerWin').window({title: '修改Banner'});
+        $('#bannerForm').form({'url': App.href + '/api/common/banner/update'});
+
+        App.getRequestData('/api/common/banner/get', {'id': id}, function(data) {
+            $("#bannerForm").find("input[name=id]").val(data.id);
+
+            $('#bannerImgDiv').html('');
+
+            $("#bannerImg").attr('value', data.bannerImg);
+            /**/
+            App.showImage("bannerImgDiv", data.bannerImg);
+
+            $("#banner_bannerTitle").textbox('setValue', data.bannerTitle);
+            $("#banner_bannerUrl").textbox('setValue', data.bannerUrl);
+            $("#banner_sort").textbox('setValue', data.sort);
+        });
     }
 
     /**
