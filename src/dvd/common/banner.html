@@ -178,10 +178,8 @@
         $('#bannerForm').form({'url': App.href + '/api/common/banner/saveBanner'});
 
         $("#bannerForm").find("input[name=id]").val('');
-        /*$('#bannerImgDiv').html('');
-
-        var bannerImgEle = App.uploadImage({id: "bannerImg", name: 'bannerImg', isAjaxUpload: true, autoUpload: true});
-        $('#bannerImgDiv').append(bannerImgEle);*/
+        App.showImage("bannerImgDiv", '');
+        $("#bannerImg").attr('value', '');
 
         $("#banner_bannerTitle").textbox('setValue', '');
         $("#banner_bannerUrl").textbox('setValue', '');
@@ -200,10 +198,9 @@
         App.getRequestData('/api/common/banner/get', {'id': id}, function(data) {
             $("#bannerForm").find("input[name=id]").val(data.id);
 
-            $('#bannerImgDiv').html('');
+            /*$('#bannerImgDiv').html('');*/
 
             $("#bannerImg").attr('value', data.bannerImg);
-            /**/
             App.showImage("bannerImgDiv", data.bannerImg);
 
             $("#banner_bannerTitle").textbox('setValue', data.bannerTitle);
